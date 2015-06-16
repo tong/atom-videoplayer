@@ -28,11 +28,6 @@ class VideoPlayer {
 
         this.view = view;
 
-        //var BrowserWindow = js.Lib.require( 'browser-window' );
-        //var win = untyped __js__('new BrowserWindow()');
-        //win.loadUrl('https://github.com');
-        //win.show();
-
         view.addEventListener( 'focus', handleFocus, false );
         view.addEventListener( 'blur', handleBlur, false );
         view.addEventListener( 'ended', handleVideoEnd, false );
@@ -48,8 +43,6 @@ class VideoPlayer {
     public function destroy() {
 
         trace("destroy");
-
-        //VideoPlayerPackage.players.remove( path );
 
         subscriptions.dispose();
 
@@ -82,11 +75,15 @@ class VideoPlayer {
     public function togglePlayback() : Void
         isPlaying ? pause() : play();
 
+    public function toggleControls() : Void
+        view.controls = !view.controls;
+
     function addCommand( id : String, fun )
         subscriptions.add( Atom.commands.add( 'atom-workspace', 'videoplayer:$id', function(_) fun() ) );
 
     function handleFocus(e) {
         addCommand( 'toggle-playback', togglePlayback );
+        addCommand( 'toggle-controls', toggleControls );
         addCommand( 'seek-forward', function() view.seek( view.duration/seekFactor ) );
         addCommand( 'seek-backward', function() view.seek( -view.duration/seekFactor ) );
         addCommand( 'seek-forward-fast', function() view.seek( view.duration/seekFastFactor ) );
