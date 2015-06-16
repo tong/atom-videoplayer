@@ -7,3 +7,4 @@
     'ctrl-right':   'videoplayer:seek-forward-fast'
     'up':           'videoplayer:goto-start'
     'down':         'videoplayer:goto-end'
+    'm':            'videoplayer:mute'

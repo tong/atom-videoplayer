@@ -11,6 +11,7 @@ import js.html.VideoElement;
     duration,
     focus,
     loop,
+    muted,
     pause,
     play,
     removeEventListener

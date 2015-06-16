@@ -40,8 +40,6 @@ class VideoPlayer {
 
     public function destroy() {
 
-        trace("destroy");
-
         subscriptions.dispose();
 
         pause();
@@ -84,6 +82,7 @@ class VideoPlayer {
         addCommand( 'seek-backward-fast', function() view.seek( -view.duration/seekFastFactor ) );
         addCommand( 'goto-start', function() view.currentTime = 0 );
         addCommand( 'goto-end', function() view.currentTime = view.duration );
+        addCommand( 'mute', function() view.muted = !view.muted );
         //addCommand( 'quit', destroy );
     }
 
