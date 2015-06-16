@@ -1,0 +1,9 @@
+'.platform-linux .videoplayer':
+    'space':        'videoplayer:toggle-playback'
+    'enter':        'videoplayer:toggle-playback'
+    'left':         'videoplayer:seek-backward'
+    'right':        'videoplayer:seek-forward'
+    'ctrl-left':    'videoplayer:seek-backward-fast'
+    'ctrl-right':   'videoplayer:seek-forward-fast'
+    'up':           'videoplayer:goto-start'
+    'down':         'videoplayer:goto-end'

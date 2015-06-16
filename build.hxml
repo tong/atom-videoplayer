@@ -1,0 +1,9 @@
+-js lib/videoplayer.js
+-cp src
+-cp ../../lib/hxatom/src
+-cp ../../lib/om/src
+-lib hxnodejs
+VideoPlayerPackage
+#-debug
+--no-traces
+-dce full

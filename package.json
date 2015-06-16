@@ -1,0 +1,13 @@
+{
+  "name": "videoplayer",
+  "main": "./lib/videoplayer",
+  "version": "0.1.0",
+  "description": "Videoplayer",
+  "keywords": ["video","videoplayer","media","player","mp4"],
+  "repository": "https://github.com/tong/atom-videoplayer",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "dependencies": {}
+}
