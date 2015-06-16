@@ -16,6 +16,11 @@ class VideoPlayerPackage {
             "type": "boolean",
             "default": true
         },
+        loop: {
+            "title": "Loop video",
+            "type": "boolean",
+            "default": false
+        },
         volume: {
             "title": "Default Volume",
             "type": "number",
@@ -30,16 +35,6 @@ class VideoPlayerPackage {
             "default": "rgba(0,0,0,0.7)"
         }
         */
-        /*
-        filetypes: {
-            "title": "File types",
-            "type": "array",
-            "items": {
-                "type": "string"
-            },
-            "default": allowedFileTypes
-        }
-        */
     };
 
     static var opener : Disposable;
@@ -49,15 +44,13 @@ class VideoPlayerPackage {
 
         trace( 'Atom-videoplayer' );
 
-        viewProvider = Atom.views.addViewProvider({
-            modelConstructor: VideoPlayer,
-            createView: function(player:VideoPlayer) {
+        viewProvider = Atom.views.addViewProvider( VideoPlayer, function(player:VideoPlayer) {
                 //var background = Atom.config.get( 'videoplayer.background' ).toHexString();
                 var view = new VideoPlayerView( player.path, Atom.config.get( 'videoplayer.volume' ) );
                 player.initialize( view );
                 return view;
             }
-        });
+        );
 
         opener = Atom.workspace.addOpener(function(path){
             return allowedFileTypes.has( path.extension() ) ? new VideoPlayer( path ) : null;

@@ -10,6 +10,7 @@ import js.html.VideoElement;
     currentTime,
     duration,
     focus,
+    loop,
     pause,
     play,
     removeEventListener

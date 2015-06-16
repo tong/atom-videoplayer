@@ -34,6 +34,7 @@ class VideoPlayer {
         //view.addEventListener( 'playing', handleVideoPlay, false );
         //view.addEventListener( 'DOMNodeRemoved', handleVideoRemove, false );
 
+        view.loop = Atom.config.get( 'videoplayer.loop' );
         if( Atom.config.get( 'videoplayer.autoplay' ) ) play();
     }
 
