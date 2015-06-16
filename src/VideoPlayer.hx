@@ -28,17 +28,28 @@ class VideoPlayer {
 
         this.view = view;
 
+        //var BrowserWindow = js.Lib.require( 'browser-window' );
+        //var win = untyped __js__('new BrowserWindow()');
+        //win.loadUrl('https://github.com');
+        //win.show();
+
         view.addEventListener( 'focus', handleFocus, false );
         view.addEventListener( 'blur', handleBlur, false );
         view.addEventListener( 'ended', handleVideoEnd, false );
+        //view.addEventListener( 'error', handleVideoError, false );
         //view.addEventListener( 'playing', handleVideoPlay, false );
         //view.addEventListener( 'DOMNodeRemoved', handleVideoRemove, false );
+        view.addEventListener( 'dbclick', function(e) trace(e), false );
 
         view.loop = Atom.config.get( 'videoplayer.loop' );
         if( Atom.config.get( 'videoplayer.autoplay' ) ) play();
     }
 
     public function destroy() {
+
+        trace("destroy");
+
+        //VideoPlayerPackage.players.remove( path );
 
         subscriptions.dispose();
 
@@ -83,7 +94,6 @@ class VideoPlayer {
         addCommand( 'goto-start', function() view.currentTime = 0 );
         addCommand( 'goto-end', function() view.currentTime = view.duration );
         addCommand( 'mute', function() view.muted = !view.muted );
-        //addCommand( 'quit', destroy );
     }
 
     function handleBlur(e) {

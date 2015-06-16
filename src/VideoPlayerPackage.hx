@@ -53,7 +53,9 @@ class VideoPlayerPackage {
         );
 
         opener = Atom.workspace.addOpener(function(path){
-            return allowedFileTypes.has( path.extension() ) ? new VideoPlayer( path ) : null;
+            if( allowedFileTypes.has( path.extension() ) )
+                return new VideoPlayer( path );
+            return null;
         });
     }
 
