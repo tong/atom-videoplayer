@@ -1,4 +1,4 @@
-'.platform-linux .videoplayer':
+'.videoplayer':
     'space':        'videoplayer:toggle-playback'
     'enter':        'videoplayer:toggle-playback'
     'left':         'videoplayer:seek-backward'
