@@ -3,8 +3,14 @@
     'enter':        'videoplayer:toggle-playback'
     'left':         'videoplayer:seek-backward'
     'right':        'videoplayer:seek-forward'
-    'ctrl-left':    'videoplayer:seek-backward-fast'
-    'ctrl-right':   'videoplayer:seek-forward-fast'
     'up':           'videoplayer:goto-start'
     'down':         'videoplayer:goto-end'
     'm':            'videoplayer:mute'
+
+'.platform-linux,.platform-win32 .videoplayer':
+    'ctrl-left':    'videoplayer:seek-backward-fast'
+    'ctrl-right':   'videoplayer:seek-forward-fast'
+
+'.platform-darwin .videoplayer':
+    'cmd-left':    'videoplayer:seek-backward-fast'
+    'cmd-right':   'videoplayer:seek-forward-fast'
