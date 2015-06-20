@@ -2,64 +2,33 @@
 import js.Browser.document;
 import js.html.Element;
 import js.html.VideoElement;
+import js.html.DivElement;
 
-@:forward(
-    addEventListener,
-    controls,
-    currentTime,
-    duration,
-    focus,
-    loop,
-    muted,
-    pause,
-    play,
-    removeEventListener
-)
-abstract VideoPlayerView(VideoElement) {
+class VideoPlayerView {
 
-    public inline function new( path : String, volume : Float ) {
-        this = document.createVideoElement();
-        this.classList.add( 'videoplayer' );
-        this.setAttribute( 'tabindex', '-1' );
-        //this.setAttribute( 'context', 'videoplayer' );
-        this.controls = true;
-        this.volume = volume;
-        this.src = 'file://$path';
-        //this.style.backgroundColor = backgroundColor;
-        this.addEventListener( 'DOMNodeInserted', handleInsert, false );
-        //TODO Atom.config.observe( 'videoplayer.background', {}, function(color) trace(color) );
+    public var dom(default,null) : DivElement;
+    public var video(default,null) : VideoElement;
+    public var info(default,null) : DivElement;
+
+    public function new() {
+
+        dom = document.createDivElement();
+        dom.classList.add( 'videoplayer' );
+        dom.setAttribute( 'tabindex', '-1' );
+
+        video = document.createVideoElement();
+        dom.appendChild( video );
+
+        info = document.createDivElement();
+        info.classList.add( 'info' );
+        dom.appendChild( info );
     }
 
-    public inline function seek( time : Float ) {
-        if( this.currentTime != null )
-            this.currentTime = this.currentTime + time;
+    public function destroy() {
     }
 
-    public inline function destroy() {
-        this.removeEventListener( 'mousewheel', handleMouseWheel );
-        this.removeEventListener( 'dblclick', handleDoubleClick );
-        this.removeEventListener( 'DOMNodeInserted', handleInsert );
-        this.pause();
-        this.remove();
-        this.src = null;
+    public function seek( time : Float ) {
+        if( video.currentTime != null )
+            video.currentTime = video.currentTime + time;
     }
-
-    function handleInsert(e) {
-        this.removeEventListener( 'DOMNodeInserted', handleInsert );
-        this.addEventListener( 'mousewheel', handleMouseWheel, false );
-        this.addEventListener( 'dblclick', handleDoubleClick, false );
-        this.parentElement.style.backgroundColor = this.style.backgroundColor;
-    }
-
-    function handleMouseWheel(e) {
-        seek( -e.wheelDelta/100 );
-    }
-
-    function handleDoubleClick(e) {
-        if( untyped document.webkitFullscreenEnabled ) {
-            //TODO not working
-            untyped document.documentElement.webkitRequestFullscreen();
-        }
-    }
-
 }

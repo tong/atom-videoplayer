@@ -5,8 +5,9 @@ using Lambda;
 using haxe.io.Path;
 
 @:keep
-@:expose
-class VideoPlayerPackage {
+class Main {
+
+    static inline function __init__() untyped module.exports = Main;
 
     static var allowedFileTypes = ['3gp','avi','mov','mp4','m4v','mkv','ogv','ogm','webm'];
 
@@ -39,24 +40,38 @@ class VideoPlayerPackage {
 
     static var opener : Disposable;
     static var viewProvider : Disposable;
+    //static var statusBar : StatusBarView;
 
     static function activate( state ) {
 
         trace( 'Atom-videoplayer' );
+        //trace(state);
+
+        //statusBar = new StatusBarView();
 
         viewProvider = Atom.views.addViewProvider( VideoPlayer, function(player:VideoPlayer) {
-                //var background = Atom.config.get( 'videoplayer.background' ).toHexString();
-                var view = new VideoPlayerView( player.path, Atom.config.get( 'videoplayer.volume' ) );
-                player.initialize( view );
-                return view;
-            }
-        );
+            var view = new VideoPlayerView();
+            player.initialize( view );
+            //player.on( 'event', function(e) trace(e) );
+            return view.dom;
+        });
 
         opener = Atom.workspace.addOpener(function(path){
-            if( allowedFileTypes.has( path.extension() ) )
-                return new VideoPlayer( path );
+            var ext = path.extension().toLowerCase();
+            //var v = js.Browser.document.createVideoElement();
+            //trace(v.canPlayType('video/$ext'));
+            if( allowedFileTypes.has( ext ) ) {
+                var player = new VideoPlayer( path );
+                player.onReady = function() {
+                    //statusBar.setText( player.videoWidth+'x'+player.videoHeight );
+                }
+                //players.push( player );
+                return player;
+            }
             return null;
         });
+
+        //Atom.commands.add( '.tree-view .file .name[data-name$=\\.mp4]', 'videoplayer:preview', function(e) trace(e) );
     }
 
     static function deactivate() {
@@ -64,6 +79,16 @@ class VideoPlayerPackage {
         opener.dispose();
     }
 
-    static inline function __init__() untyped module.exports = VideoPlayerPackage;
+    /*
+    static function serialize() {
+        return {
+            players: arr
+        }
+    }
+    */
+
+    static function consumeStatusBar( bar ) {
+        //bar.addLeftTile( { item: statusBar.dom, priority:10 } );
+    }
 
 }
