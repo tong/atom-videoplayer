@@ -22,6 +22,20 @@ class Main {
             "type": "boolean",
             "default": false
         },
+        seek_speed: {
+            "title": "Seek speed keyboard",
+            "type": "number",
+            "default": 0.5,
+            "minimum": 0.0,
+            "maximum": 1.0
+        },
+        wheel_speed: {
+            "title": "Seek speed mousewheel",
+            "type": "number",
+            "default": 0.5,
+            "minimum": 0.0,
+            "maximum": 1.0
+        },
         volume: {
             "title": "Default Volume",
             "type": "number",
@@ -70,8 +84,6 @@ class Main {
             }
             return null;
         });
-
-        //Atom.commands.add( '.tree-view .file .name[data-name$=\\.mp4]', 'videoplayer:preview', function(e) trace(e) );
     }
 
     static function deactivate() {

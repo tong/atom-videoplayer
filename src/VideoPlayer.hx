@@ -1,6 +1,7 @@
 
 import js.Browser.window;
 import Atom.config;
+import atom.CompositeDisposable;
 import VideoPlayerView;
 
 using haxe.io.Path;
@@ -13,25 +14,26 @@ class VideoPlayer  {
     public var path(default,null) : String;
     public var isReady(default,null) : Bool;
     public var isPlaying(default,null) : Bool;
+    public var width(get,null) : Int;
+    public var height(get,null) : Int;
 
-    public var seekFactor = 30.0;
-    public var seekFastFactor = 10.0;
-    public var wheelSpeed = 1.0;
-
-    public var videoWidth(get,null) : Int;
-    public var videoHeight(get,null) : Int;
-
+    var seekSpeed : Float;
+    var wheelSpeed : Float;
     var view : VideoPlayerView;
-    var subscriptions : atom.CompositeDisposable;
+    var subscriptions : CompositeDisposable;
 
     public function new( path : String ) {
+
         this.path = path;
+
+        seekSpeed = config.get( 'videoplayer.seek_speed' );
+        wheelSpeed = config.get( 'videoplayer.wheel_speed' );
         isReady = isPlaying = false;
-        subscriptions = new atom.CompositeDisposable( );
+        subscriptions = new CompositeDisposable();
     }
 
-    inline function get_videoWidth() return isReady ? view.video.videoWidth : null;
-    inline function get_videoHeight() return isReady ? view.video.videoHeight : null;
+    inline function get_width() return isReady ? view.video.videoWidth : null;
+    inline function get_height() return isReady ? view.video.videoHeight : null;
 
     public function initialize( view : VideoPlayerView ) {
 
@@ -49,8 +51,6 @@ class VideoPlayer  {
         view.dom.addEventListener( 'blur', handleBlur, false );
         view.dom.addEventListener( 'click', handleClick, false );
         view.dom.addEventListener( 'mousewheel', handleMouseWheel, false );
-
-        //view.addEventListener( 'blur', handleBlur, false );
         //view.addEventListener( 'dbclick', function(e) trace(e), false );
         //view.addEventListener( 'DOMNodeRemoved', handleVideoRemove, false );
         //view.addEventListener( 'playing', handleVideoPlay, false );
@@ -62,7 +62,7 @@ class VideoPlayer  {
     public function destroy() {
         subscriptions.dispose();
         view.destroy();
-        view.video.removeEventListener( 'canplay', handleCanPlay );
+        view.video.removeEventListener( 'canplaythrough', handleCanPlay );
         view.dom.removeEventListener( 'focus', handleBlur );
         view.dom.removeEventListener( 'blur', handleBlur );
         view.dom.removeEventListener( 'click', handleClick );
@@ -70,6 +70,10 @@ class VideoPlayer  {
     }
 
     public inline function getTitle() {
+        return path.withoutDirectory();
+    }
+
+    public inline function getLongTitle() {
         return path.withoutDirectory();
     }
 
@@ -122,15 +126,16 @@ class VideoPlayer  {
     function handleClick(e)
         togglePlayback();
 
-    function handleMouseWheel(e)
-        view.seek( -e.wheelDelta/1000*wheelSpeed );
+    function handleMouseWheel(e) {
+        var v = e.wheelDelta / 100 * wheelSpeed;
+        if( e.ctrlKey ) v *= 10;
+        view.seek( v );
+    }
 
     function handleFocus(e) {
         addCommand( 'toggle-playback', togglePlayback );
-        addCommand( 'seek-forward', function() view.seek( view.video.duration/seekFactor ) );
-        addCommand( 'seek-backward', function() view.seek( -view.video.duration/seekFactor ) );
-        addCommand( 'seek-forward-fast', function() view.seek( view.video.duration/seekFastFactor ) );
-        addCommand( 'seek-backward-fast', function() view.seek( -view.video.duration/seekFastFactor ) );
+        addCommand( 'seek-forward', function() view.seek( view.video.duration / 10 * seekSpeed ) );
+        addCommand( 'seek-backward', function() view.seek( -(view.video.duration / 10 * seekSpeed) ) );
         addCommand( 'goto-start', function() view.video.currentTime = 0 );
         addCommand( 'goto-end', function() view.video.currentTime = view.video.duration );
         addCommand( 'mute', function() view.video.muted = !view.video.muted );

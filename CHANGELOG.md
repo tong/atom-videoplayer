@@ -1,3 +1,7 @@
+### 0.1.4
+* Configureable seek speed factor
+* Configureable wheel speed factor
+
 ### 0.1.3
 * Hide fullscreen control button
 * Show tab icon

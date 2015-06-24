@@ -27,8 +27,8 @@ class VideoPlayerView {
     public function destroy() {
     }
 
-    public function seek( time : Float ) {
-        if( video.currentTime != null )
-            video.currentTime = video.currentTime + time;
+    public inline function seek( time : Float ) {
+        if( video.currentTime != null ) video.currentTime += time;
     }
+
 }

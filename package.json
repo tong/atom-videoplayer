@@ -1,12 +1,12 @@
 {
   "name": "videoplayer",
   "main": "./lib/atom-videoplayer",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Playback video files",
   "consumedServices": {
       "status-bar": { "versions": { "^1.0.0": "consumeStatusBar" } }
   },
-  "keywords": ["video","videoplayer","media","player","mp4"],
+  "keywords": ["video","videoplayer","media","player","mp4","avi","webm","3gp","mov"],
   "repository": "https://github.com/tong/atom-videoplayer",
   "license": "MIT",
   "engines": {
