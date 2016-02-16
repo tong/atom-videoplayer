@@ -1,4 +1,20 @@
+
 @import "ui-variables";
+
+[data-name$='.3gp']:before,
+[data-name$='.avi']:before,
+[data-name$='.mov']:before,
+[data-name$='.mp4']:before,
+[data-name$='.m4v']:before,
+[data-name$='.mkv']:before,
+[data-name$='.ogv']:before,
+[data-name$='.ogm']:before,
+[data-name$='.webm']:before {
+    content: "\f057";
+}
+
+
+/* ------- VideoPlayer ------- */
 
 .videoplayer {
     //background: #000;
@@ -18,13 +34,6 @@
     display: none;
 }
 
-/* ------- Statusbar ------- */
-
-.videoplayer-status {
-    display: none;
-}
-
-
 /*
 video::-webkit-media-controls-play-button {}
 video::-webkit-media-controls-timeline {}
@@ -41,16 +50,10 @@ video::-webkit-media-controls-volume-slider {}
 .scalemode-stretch {
 }
 */
-/*
-[data-name$='.3gp']:before,
-[data-name$='.avi']:before,
-[data-name$='.mov']:before,
-[data-name$='.mp4']:before,
-[data-name$='.m4v']:before,
-[data-name$='.mkv']:before,
-[data-name$='.ogv']:before,
-[data-name$='.ogm']:before,
-[data-name$='.webm']:before {
-    //content: "\f057";
+
+
+/* ------- Statusbar ------- */
+
+.videoplayer-status {
+    display: none;
 }
-*/
