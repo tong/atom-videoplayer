@@ -50,7 +50,9 @@ class VideoPlayerView {
         video.addEventListener( 'error', function(e) {
             Atom.notifications.addWarning( 'Failed to play '+e.target.src );
             //TODO close pane
-            //var item = Atom.workspace.getActivePaneItem();
+            var pane = Atom.workspace.getActivePane();
+            pane.destroy();
+            //player.destroy();
 
         }, false );
 
