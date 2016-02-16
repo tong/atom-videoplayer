@@ -13,36 +13,38 @@
     content: "\f057";
 }
 
-
 /* ------- VideoPlayer ------- */
 
 .videoplayer {
     //background: #000;
-}
 
-.videoplayer video {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}
-.videoplayer video:-webkit-full-screen {
-    width: 100%;
-    height: 100%;
-}
+    video {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
 
-.videoplayer video::-webkit-media-controls-fullscreen-button {
-    display: none;
-}
+    video::-webkit-full-screen {
+        width: 100%;
+        height: 100%;
+    }
 
-/*
-video::-webkit-media-controls-play-button {}
-video::-webkit-media-controls-timeline {}
-video::-webkit-media-controls-current-time-display{}
-video::-webkit-media-controls-time-remaining-display {}
-video::-webkit-media-controls-mute-button {}
-video::-webkit-media-controls-toggle-closed-captions-button {}
-video::-webkit-media-controls-volume-slider {}
-*/
+    video::-webkit-media-controls-panel {
+        //opacity:0.5;
+        //border-radius:0;
+        background: none;
+    }
+
+    video::-webkit-media-controls-fullscreen-button {
+        //display: none;
+    }
+
+    video::-webkit-media-controls-play-button {
+        cursor: pointer;
+    }
+
+    // SEE: https://gist.github.com/afabbro/3759334
+}
 
 /*
 .scalemode-fit {
@@ -50,7 +52,6 @@ video::-webkit-media-controls-volume-slider {}
 .scalemode-stretch {
 }
 */
-
 
 /* ------- Statusbar ------- */
 
