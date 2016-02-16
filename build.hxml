@@ -1,10 +1,5 @@
--js lib/atom-videoplayer.js
--cp src
--cp ../../lib/hxatom/src
--cp ../../lib/om/src
--lib hxnodejs
+-js lib/videoplayer.js
+-lib hxatom
 -dce full
--D atom
+-cp src
 Main
-#-debug
-#--no-traces

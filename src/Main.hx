@@ -1,5 +1,6 @@
 
 import atom.Disposable;
+import js.node.Fs;
 
 using Lambda;
 using haxe.io.Path;
@@ -14,23 +15,24 @@ class Main {
     static var config = {
         autoplay: {
             "title": "Autoplay",
+            "description": "Autoplay video when opened",
             "type": "boolean",
             "default": true
         },
         loop: {
-            "title": "Loop video",
+            "title": "Loop Video",
             "type": "boolean",
             "default": false
         },
         seek_speed: {
-            "title": "Seek speed keyboard",
+            "title": "Keyboard Seek Speed",
             "type": "number",
             "default": 0.5,
             "minimum": 0.0,
             "maximum": 1.0
         },
         wheel_speed: {
-            "title": "Seek speed mousewheel",
+            "title": "Mousewheel Seek Speed",
             "type": "number",
             "default": 0.5,
             "minimum": 0.0,
@@ -45,62 +47,71 @@ class Main {
         }
         /*
         background: {
-            "title": "Background color",
+            "title": "Background Color",
             "type": "color",
-            "default": "rgba(0,0,0,0.7)"
+            "default": "#000000"
         }
         */
     };
 
-    static var opener : Disposable;
-    static var viewProvider : Disposable;
-    //static var statusBar : StatusBarView;
+    static var disposables : atom.CompositeDisposable;
+    static var statusbar : Statusbar;
+    //static var statusbarAttached : Bool;
 
-    static function activate( state ) {
+    static function activate( state : { players:Array<{path:String}> } ) {
 
-        trace( 'Atom-videoplayer' );
-        //trace(state);
+        trace( 'Atom-videoplayer ' );
 
-        //statusBar = new StatusBarView();
+        //statusbarAttached = false;
 
-        viewProvider = Atom.views.addViewProvider( VideoPlayer, function(player:VideoPlayer) {
-            var view = new VideoPlayerView();
-            player.initialize( view );
-            //player.on( 'event', function(e) trace(e) );
-            return view.dom;
-        });
+        disposables = new atom.CompositeDisposable();
+        disposables.add( Atom.workspace.addOpener( openURI ) );
+        /*
+        disposables.add( Atom.workspace.onDidChangeActivePaneItem( function(e){
+                trace(e);
+        } ) );
+        */
 
-        opener = Atom.workspace.addOpener(function(path){
-            var ext = path.extension().toLowerCase();
-            //var v = js.Browser.document.createVideoElement();
-            //trace(v.canPlayType('video/$ext'));
-            if( allowedFileTypes.has( ext ) ) {
-                var player = new VideoPlayer( path );
-                player.onReady = function() {
-                    //statusBar.setText( player.videoWidth+'x'+player.videoHeight );
-                }
-                //players.push( player );
-                return player;
-            }
-            return null;
-        });
+        disposables.add(
+            Atom.views.addViewProvider( VideoPlayer, function(player:VideoPlayer) {
+                return new VideoPlayerView( player ).element;
+            })
+        );
     }
 
     static function deactivate() {
-        viewProvider.dispose();
-        opener.dispose();
+        disposables.dispose();
+        statusbar.destroy();
+    }
+
+    static function consumeStatusBar( pane ) {
+        //attachImageEditorStatusView( pane );
+        statusbar = new Statusbar();
+        pane.addLeftTile( { item: statusbar.element, priority:10 } );
     }
 
     /*
-    static function serialize() {
-        return {
-            players: arr
-        }
+    static function attachImageEditorStatusView( pane ) {
+        trace("attachImageEditorStatusView");
+        //trace(Atom.workspace.getActivePaneItem());
+        if( statusbarAttached || pane == null || !Std.is( Atom.workspace.getActivePaneItem(), VideoPlayer ) )
+            return;
+        trace(">>");
+        var statusbar = new Statusbar( pane );
+        pane.addLeftTile( { item: statusbar.element, priority:10 } );
+        statusbar.attach();
+        statusbarAttached = true;
     }
     */
 
-    static function consumeStatusBar( bar ) {
-        //bar.addLeftTile( { item: statusBar.dom, priority:10 } );
+    static function openURI( uri : String ) {
+        //trace('openURI '+uri);
+        var ext = uri.extension().toLowerCase();
+        if( allowedFileTypes.has( ext ) ) {
+            //var v = js.Browser.document.createVideoElement();
+            //trace(v.canPlayType('video/$ext'));
+            return new VideoPlayer( uri );
+        }
+        return null;
     }
-
 }
