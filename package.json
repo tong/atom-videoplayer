@@ -1,7 +1,7 @@
 {
   "name": "videoplayer",
   "main": "./lib/videoplayer",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Playback video files",
   "consumedServices": {
       "status-bar": { "versions": { "^1.0.0": "consumeStatusBar" } }
@@ -10,7 +10,12 @@
   "repository": "https://github.com/tong/atom-videoplayer",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.5.0 <2.0.0"
+    "atom": ">=1.5.3 <2.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+
+  },
+  "deserializers": {
+      "VideoPlayer": "VideoPlayer.deserialize"
+  }
 }

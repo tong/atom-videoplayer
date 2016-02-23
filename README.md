@@ -14,4 +14,4 @@ Playback video files.
 * ogm
 * webm
 
-![Screenshot](screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/tong/atom-videoplayer/master/screenshot.png)

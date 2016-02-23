@@ -1,66 +1,75 @@
 
+import js.html.HtmlElement;
 import js.html.Element;
 import js.html.DivElement;
 import js.html.MutationObserver;
 import js.html.VideoElement;
 import js.Browser.document;
+import js.Browser.window;
 import Atom.config;
 
 @:keep
+@:expose
 class VideoPlayerView {
 
     @:keep
     @:expose
-    public var element(default,null) : Element;
+    public var element(default,null) : HtmlElement;
 
     var video : VideoElement;
     var isPlaying : Bool;
-    var isFullscreen : Bool;
     var seekSpeed : Float;
     var wheelSpeed : Float;
     var disposables : atom.CompositeDisposable;
 
     public function new( player : VideoPlayer ) {
 
+        this.video = player.video;
+
         isPlaying = true;
-        isFullscreen = false;
         seekSpeed = config.get( 'videoplayer.seek_speed' );
         wheelSpeed = config.get( 'videoplayer.wheel_speed' );
 
-        element = document.createDivElement();
+        element = document.createHtmlElement();
         element.classList.add( 'videoplayer' );
         //element.style.backgroundColor = config.get( 'videoplayer.background' ).toRGBAString();
         element.setAttribute( 'tabindex', '-1' );
-
-        video = document.createVideoElement();
-        video.autoplay = true;
-        video.controls = true;
-        video.loop = config.get( 'videoplayer.loop' );
-        video.volume = config.get( 'videoplayer.volume' );
-        video.src = player.getPath();
+        //video = document.createVideoElement();
+        //video.controls = true;
+        //video.autoplay = config.get( 'videoplayer.autoplay' );
+        //video.loop = config.get( 'videoplayer.loop' );
+        //video.volume = config.get( 'videoplayer.volume' );
+        //video.src = player.getPath();
+        //element.appendChild( video );
         element.appendChild( video );
+
+        document.addEventListener( 'fullscreenchange', function(e) trace(e), false );
+        document.addEventListener( 'webkitFfullscreenchange', function(e) trace(e), false );
+        window.addEventListener( 'fullscreenchange', function(e) trace(e), false );
+        window.addEventListener( 'webkitFfullscreenchange', function(e) trace(e), false );
 
         element.addEventListener( 'mousewheel', handleMouseWheel, false );
         //element.addEventListener( 'focus', function(e) trace(e) , false );
         //element.addEventListener( 'blur', function(e) handleClickVideo(e) , false );
 
-        //video.addEventListener( 'playing', handleVideoPlay, false );
-        video.addEventListener( 'click', handleClickVideo, false );
-        video.addEventListener( 'ended', handleVideoEnd, false );
-        video.addEventListener( 'error', function(e) {
+        player.video.addEventListener( 'click', handleClickVideo, false );
+        player.video.addEventListener( 'playing', handleVideoPlaying, false );
+        player.video.addEventListener( 'ended', handleVideoEnd, false );
+        player.video.addEventListener( 'error', function(e) {
             Atom.notifications.addWarning( 'Failed to play '+e.target.src );
-            //TODO close pane
-            var pane = Atom.workspace.getActivePane();
-            pane.destroy();
-            //player.destroy();
-
+            Atom.workspace.paneForURI( player.getURI() ).destroy();
+            //Atom.workspace.getActivePane().destroy();
         }, false );
 
+        window.addEventListener( 'resize', handleResize, false );
+
+        // HACK
         var observer = new MutationObserver(function(mutations,o) {
-            //for( m in mutations ) js.Browser.console.debug(m);
-            if( isPlaying ) video.play();
+            if( isPlaying ) {
+                //video.currentTime =
+                video.play();
+            }
         });
-        //observer.observe( element, { attributes:true, childList:true, characterData:true } );
         observer.observe( element, { attributes: true } );
 
         disposables = new atom.CompositeDisposable();
@@ -70,6 +79,13 @@ class VideoPlayerView {
         disposables.add( Atom.commands.add( element, 'videoplayer:seek-forward', function(e) seek( (video.duration / 10 * seekSpeed) ) ) );
         disposables.add( Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 ) );
         disposables.add( Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration ) );
+
+        disposables.add( Atom.config.onDidChange( 'videoplayer', {}, function(e){
+            var ov = e.oldValue;
+            var nv = e.newValue;
+            video.autoplay = nv.autoplay;
+            video.loop = nv.loop;
+        }) );
     }
 
     public function initialize( player : VideoPlayer ) {
@@ -84,6 +100,7 @@ class VideoPlayerView {
 
     public function destroy() {
         trace( "destroy" );
+        disposables.dispose();
     }
 
     public function attached() {
@@ -132,26 +149,27 @@ class VideoPlayerView {
         video.muted = !video.muted;
 
     public function enterFullscreen() {
-        //untyped video.webkitEnterFullscreen();
-        //video.requestFullscreen();
-        //untyped document.documentElement.webkitRequestFullscreen();
         untyped video.webkitRequestFullscreen();
-        isFullscreen = true;
     }
 
     public function exitFullscreen() {
-        //untyped video.webkitExitFullscreen();
         untyped document.webkitExitFullscreen();
-        isFullscreen = false;
     }
 
     public function toggleFullscreen() {
-        isFullscreen ? exitFullscreen() : enterFullscreen();
+        untyped document.webkitIsFullScreen ? exitFullscreen() : enterFullscreen();
+    }
+
+    function handleVideoPlaying(e) {
     }
 
     function handleVideoEnd(e) {
         isPlaying = false;
-        if( isFullscreen ) exitFullscreen();
+        if( untyped document.webkitIsFullScreen ) exitFullscreen();
+    }
+
+    function handleResize(e) {
+        //trace(e);
     }
 
     function handleClickVideo(e) {
@@ -166,4 +184,5 @@ class VideoPlayerView {
         }
         seek( v );
     }
+
 }

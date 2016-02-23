@@ -1,3 +1,7 @@
+
+### 0.2.3
+* Fullscreen support
+
 ### 0.1.4
 * Configureable seek speed factor
 * Configureable wheel speed factor

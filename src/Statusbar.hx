@@ -26,14 +26,17 @@ class Statusbar {
                 var video : VideoElement = cast view.children[0];
                 video.addEventListener( 'canplaythrough', function(e){
                     var info = video.videoWidth+"x"+video.videoHeight;
-                //    trace(video);
                     //trace(untyped video.webkitAudioDecodedByteCount);
                     //trace(untyped video.webkitDroppedFrameCount);
-                    //trace(untyped video.webkitDroppedFrameCount);
                     //var q = video.getVideoPlaybackQuality();
-                    //trace(q);
                     element.textContent = info;
                     element.style.display = 'inline-block';
+                    /*
+                    Atom.tooltips.add( element, { title:
+                        '<div>AudioDecodedByteCount: '+untyped video.webkitAudioDecodedByteCount+'</div>'
+                    } );
+                    */
+
                 }, false );
             } else {
                 element.textContent = '';
@@ -42,21 +45,8 @@ class Statusbar {
         } ) );
     }
 
-    public function attach() {
-        trace("attach");
-    }
-
-    public function attached() {
-        trace("attached");
-    }
-
     public function destroy() {
-        trace("destroy");
         disposables.dispose();
-    }
-
-    public function update() {
-        trace("update");
     }
 
     public function setText( text : String ) {
