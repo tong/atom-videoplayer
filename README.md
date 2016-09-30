@@ -3,6 +3,7 @@
 
 Playback video files.
 
+[![Build Status](https://travis-ci.org/tong/atom-videoplayer.svg?branch=master)](https://travis-ci.org/tong/atom-videoplayer)
 
 ### Supported formats
 * 3gp
