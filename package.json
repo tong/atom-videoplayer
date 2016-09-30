@@ -1,7 +1,7 @@
 {
   "name": "videoplayer",
   "main": "./lib/videoplayer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Playback video files",
   "consumedServices": {
       "status-bar": { "versions": { "^1.0.0": "consumeStatusBar" } }
@@ -10,12 +10,32 @@
   "repository": "https://github.com/tong/atom-videoplayer",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.5.3 <2.0.0"
+    "atom": ">=1.10.2 <2.0.0"
   },
   "dependencies": {
 
   },
   "deserializers": {
-      "VideoPlayer": "VideoPlayer.deserialize"
+      "VideoPlayer": "deserialize"
+  },
+  "configSchema": {
+      "autoplay": {
+          "title": "Autoplay",
+          "description": "Autoplay when opened",
+          "type": "boolean",
+          "default": true
+      },
+      "loop": {
+          "title": "Loop Video",
+          "type": "boolean",
+          "default": false
+      },
+      "volume": {
+          "title": "Default Volume",
+          "type": "number",
+          "default": 0.7,
+          "minimum": 0.0,
+          "maximum": 1.0
+      }
   }
 }

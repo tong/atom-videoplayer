@@ -2,4 +2,4 @@
 -lib hxatom
 -dce full
 -cp src
-Main
+VideoPlayer
