@@ -1,5 +1,7 @@
 
 import js.Browser.document;
+import js.Browser.window;
+import js.html.DivElement;
 import js.html.VideoElement;
 import js.node.Fs;
 import atom.CompositeDisposable;
@@ -15,13 +17,7 @@ using haxe.io.Path;
 class VideoPlayer {
 
     static inline function __init__() {
-
         untyped module.exports = VideoPlayer;
-
-		disposables = new CompositeDisposable();
-        disposables.add( Atom.views.addViewProvider( VideoPlayer, function(player:VideoPlayer) {
-            return new VideoPlayerView( player ).element;
-        }));
     }
 
 	static var allowedFileTypes = ['3gp','avi','mov','mp4','m4v','mkv','ogv','ogm','webm'];
@@ -29,7 +25,10 @@ class VideoPlayer {
     static var disposables : CompositeDisposable;
 
     static function activate( state : Dynamic ) {
+
         trace( 'Atom-videoplayer ' );
+
+        disposables = new CompositeDisposable();
 		disposables.add( Atom.workspace.addOpener( openURI ) );
     }
 
@@ -41,7 +40,8 @@ class VideoPlayer {
     static function openURI( uri : String ) {
         var ext = uri.extension().toLowerCase();
         if( allowedFileTypes.has( ext ) ) {
-            return new VideoPlayer( uri, Atom.config.get( 'videoplayer.autoplay' ) );
+            //return new VideoPlayer( uri, Atom.config.get( 'videoautoplay' ) );
+            return new VideoPlayer( { path: uri, play: Atom.config.get( 'video.autoplay' ), time: null } );
         }
         return null;
     }
@@ -50,19 +50,68 @@ class VideoPlayer {
         //pane.addRightTile( { item: new Statusbar().element, priority:0 } );
     }
 
-	public var video(default,null) : VideoElement;
+    static function deserialize( state : Dynamic ) {
+        return new VideoPlayer( state );
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
 
 	var file : atom.File;
+    var element : DivElement;
+    var video : VideoElement;
+    var wheelSpeed : Float;
+    var animationFrameId : Int;
 
-	function new( path : String, play : Bool, time = 0.0 ) {
+	function new( state ) {
 
-		this.file = new File( path );
+		this.file = new File( state.path );
+
+        //seekSpeed = config.get( 'audioplayer.seek_speed' );
+        wheelSpeed = 1; //config.get( 'audioplayer.wheel_speed' );
+
+        var workspaceStyle = window.getComputedStyle( Atom.views.getView( Atom.workspace ) );
+
+        element = document.createDivElement();
+        element.classList.add( 'videoplayer' );
+        element.setAttribute( 'tabindex', '-1' );
 
 		video = document.createVideoElement();
-        video.autoplay = play;
         video.controls = true;
         video.src = file.getPath();
-        video.currentTime = time;
+        if( state.play != null ) video.autoplay = state.play;
+        if( state.time != null ) video.currentTime = state.time;
+        element.appendChild( video );
+
+        element.addEventListener( 'DOMNodeInserted', function(){
+
+            video.addEventListener( 'canplaythrough', function(e) {
+
+                element.addEventListener( 'mousewheel', handleMouseWheel, false );
+            });
+
+            /*
+            player.audio.addEventListener( 'playing', handleAudioPlaying, false );
+            player.audio.addEventListener( 'ended', handleAudioEnded, false );
+            player.audio.addEventListener( 'error', handleAudioError, false );
+            player.audio.addEventListener( 'canplaythrough', function(e) {
+
+                waveform.color = workspaceStyle.color;
+                waveform.backgroundColor = workspaceStyle.backgroundColor;
+                waveform.generate( player.getPath(), function(){
+                    updateMarker();
+                });
+
+                element.addEventListener( 'click', handleMouseDown, false );
+                element.addEventListener( 'mousewheel', handleMouseWheel, false );
+                //element.addEventListener( 'focus', function(e) trace(e) , false );
+                //element.addEventListener( 'blur', function(e) handleClickVideo(e) , false );
+
+            }, false );
+            */
+
+            window.addEventListener( 'resize', handleResize, false );
+
+        }, false );
 	}
 
 	public function serialize() {
@@ -107,7 +156,70 @@ class VideoPlayer {
         return getURI() == cast( other, VideoPlayer ).getURI();
     }
 
-	public static function deserialize( state : Dynamic ) {
-		return new VideoPlayer( state.path, state.play, state.time );
-	}
+    function update( time : Float ) {
+
+        animationFrameId = window.requestAnimationFrame( update );
+        updateMarker();
+
+        /*
+        ctx.fillStyle = '#fff';
+    	for( i in 0...frequencyData.length ) {
+			ctx.fillRect( i, 0, 1, frequencyData[i] / 256 * h );
+		}
+        */
+    }
+
+    function seek( time : Float ) : Float {
+        if( video.currentTime != null ) video.currentTime += time;
+        return video.currentTime;
+    }
+
+    /*
+    function setAudioPositionFromPanePosition( x : Int ) {
+        //audio.currentTime = audio.duration * (x / element.offsetWidth);
+    }
+    */
+
+    function updateMarker() {
+        var percentPlayed = video.currentTime / video.duration;
+        //marker.style.left = (percentPlayed * element.offsetWidth )+'px';
+    }
+
+    function handleAudioPlaying(e) {
+        //trace(e);
+        animationFrameId = window.requestAnimationFrame( update );
+    }
+
+    function handleAudioEnded(e) {
+    }
+
+    function handleAudioError(e) {
+    }
+
+    function handleMouseDown(e) {
+        //setAudioPositionFromPanePosition( e.layerX  );
+        //element.addEventListener( 'mouseup', handleMouseUp, false );
+        //element.addEventListener( 'mousemove', handleMouseMove, false );
+        //element.addEventListener( 'mouseout', handleMouseOut, false );
+    }
+
+    function handleMouseUp(e) {
+        //stopMouseSeek();
+    }
+
+    function handleMouseOut(e) {
+        //stopMouseSeek();
+    }
+
+    function handleMouseWheel(e) {
+        var v = e.wheelDelta / 100 * wheelSpeed;
+        if( e.ctrlKey ) {
+            v *= 10;
+            if( e.shiftKey ) v *= 10;
+        }
+        seek( v );
+    }
+
+    function handleResize(e) {
+    }
 }
