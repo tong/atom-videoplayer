@@ -34,7 +34,6 @@ class VideoPlayer {
 		disposables.add( Atom.workspace.addOpener( openURI ) );
 
         Atom.workspace.onDidChangeActivePaneItem( function(item){
-            trace(item);
             if( Std.is( item, VideoPlayer ) ) {
                 var player : VideoPlayer = item;
                 statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight;
@@ -52,9 +51,9 @@ class VideoPlayer {
         if( allowedFileTypes.has( ext ) ) {
             return new VideoPlayer( {
                 path: uri,
-                play: Atom.config.get( 'video.autoplay' ),
+                play: Atom.config.get( 'videoplayer.autoplay' ),
                 time: null,
-                volume : Atom.config.get( 'video.volume' )
+                volume : Atom.config.get( 'videoplayer.volume' )
             } );
         }
         return null;
@@ -73,14 +72,12 @@ class VideoPlayer {
 	var file : atom.File;
     var element : DivElement;
     var video : VideoElement;
+    var isPlaying : Bool;
     var seekSpeed : Float;
     var wheelSpeed : Float;
-    var isPlaying : Bool;
     var commands : CompositeDisposable;
 
 	function new( state ) {
-
-        trace(state);
 
 		this.file = new File( state.path );
 
