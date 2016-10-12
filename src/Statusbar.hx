@@ -1,6 +1,7 @@
 
 import js.Browser.document;
 import js.html.DivElement;
+import js.html.SpanElement;
 
 abstract Statusbar(DivElement) to DivElement {
 
@@ -9,10 +10,18 @@ abstract Statusbar(DivElement) to DivElement {
 	inline function set_text(s) return this.textContent = s;
 
 	public inline function new() {
+
 		this = document.createDivElement();
-		this.classList.add( 'status-bar-videoplayer', 'inline-block' );
-		//this.textContent = 'VIDEOPLAYER';
+		this.classList.add( 'status-bar-videoplayer', 'inline-block', 'icon', 'icon-device-camera-video'  );
+
+		hide();
 	}
 
+	public inline function show() {
+		this.style.display = 'inline-block';
+	}
 
+	public inline function hide() {
+		this.style.display = 'none';
+	}
 }
