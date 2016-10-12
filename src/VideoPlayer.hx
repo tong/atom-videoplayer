@@ -29,6 +29,7 @@ class VideoPlayer {
         trace( 'Atom-videoplayer ' );
 
         disposables = new CompositeDisposable();
+
 		disposables.add( Atom.workspace.addOpener( openURI ) );
     }
 
@@ -64,6 +65,7 @@ class VideoPlayer {
     var element : DivElement;
     var video : VideoElement;
     var wheelSpeed : Float;
+    var isPlaying : Bool;
 
 	function new( state ) {
 
@@ -88,14 +90,23 @@ class VideoPlayer {
         if( state.volume != null ) video.volume = state.volume;
         element.appendChild( video );
 
-        video.addEventListener( 'canplaythrough', function(e) {
-            element.addEventListener( 'mousewheel', handleMouseWheel, false );
-        });
+        video.addEventListener( 'playing', handleVideoPlay, false );
+        video.addEventListener( 'ended', handleVideoEnd, false );
+        video.addEventListener( 'error', handleVideoError, false );
+        video.addEventListener( 'canplaythrough', handleVideoCanPlay, false );
+        video.addEventListener( 'click', handleVideoClick, false );
+
+        //element.addEventListener( 'DOMNodeInserted', function(){
 
         /*
-        element.addEventListener( 'DOMNodeInserted', function(){
-        }, false );
+        Atom.commands.add( element, 'videoplayer:toggle-playback', function(e) togglePlayback() );
+        Atom.commands.add( element, 'videoplayer:toggle-mute', function(e) toggleMute() );
+        Atom.commands.add( element, 'videoplayer:seek-backward', function(e) seek( -(video.duration / 10 * seekSpeed) ) );
+        Atom.commands.add( element, 'videoplayer:seek-forward', function(e) seek( (video.duration / 10 * seekSpeed) ) );
+        Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 );
+        Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration );
         */
+
 	}
 
 	public function serialize() {
@@ -109,7 +120,14 @@ class VideoPlayer {
     }
 
 	public function dispose() {
+
         element.removeEventListener( 'mousewheel', handleMouseWheel );
+
+        video.removeEventListener( 'playing', handleVideoPlay );
+        video.removeEventListener( 'ended', handleVideoEnd );
+        video.removeEventListener( 'error', handleVideoError );
+        video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
+        video.removeEventListener( 'click', handleVideoClick );
 		video.pause();
         video.remove();
         video = null;
@@ -141,26 +159,64 @@ class VideoPlayer {
     }
     */
 
+    inline function enterFullscreen() {
+        untyped video.webkitRequestFullscreen();
+    }
+
+    inline function exitFullscreen() {
+        untyped document.webkitExitFullscreen();
+    }
+
+    inline function toggleFullscreen() {
+        untyped document.webkitIsFullScreen ? exitFullscreen() : enterFullscreen();
+    }
+
+    inline function togglePlayback() {
+        isPlaying ? pause() : play();
+    }
+
+    inline function toggleMute() {
+        video.muted = !video.muted;
+    }
+
+    function play() {
+        if( !isPlaying ) {
+            isPlaying = true;
+            video.play();
+        }
+    }
+
+    function pause() {
+        if( isPlaying ) {
+            isPlaying = false;
+            video.pause();
+        }
+    }
+
     function seek( time : Float ) : Float {
         if( video.currentTime != null ) video.currentTime += time;
         return video.currentTime;
     }
 
-    function handleCanPlayThrough(e) {
-        video.removeEventListener( 'canplaythrough', handleCanPlayThrough );
+    function handleVideoCanPlay(e) {
+        video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
         element.addEventListener( 'mousewheel', handleMouseWheel, false );
     }
 
-    /*
-    function handleMouseDown(e) {
+    function handleVideoPlay(e) {
     }
 
-    function handleMouseUp(e) {
+    function handleVideoEnd(e) {
+        isPlaying = false;
+        if( untyped document.webkitIsFullScreen ) exitFullscreen();
     }
 
-    function handleMouseOut(e) {
+    function handleVideoError(e) {
     }
-    */
+
+    function handleVideoClick(e) {
+        e.ctrlKey ? toggleFullscreen() : togglePlayback();
+    }
 
     function handleMouseWheel(e) {
         var v = e.wheelDelta / 100 * wheelSpeed;
@@ -171,8 +227,4 @@ class VideoPlayer {
         seek( v );
     }
 
-    /*
-    function handleResize(e) {
-    }
-    */
 }
