@@ -88,36 +88,14 @@ class VideoPlayer {
         if( state.volume != null ) video.volume = state.volume;
         element.appendChild( video );
 
+        video.addEventListener( 'canplaythrough', function(e) {
+            element.addEventListener( 'mousewheel', handleMouseWheel, false );
+        });
+
+        /*
         element.addEventListener( 'DOMNodeInserted', function(){
-
-            video.addEventListener( 'canplaythrough', function(e) {
-
-                element.addEventListener( 'mousewheel', handleMouseWheel, false );
-            });
-
-            /*
-            player.audio.addEventListener( 'playing', handleAudioPlaying, false );
-            player.audio.addEventListener( 'ended', handleAudioEnded, false );
-            player.audio.addEventListener( 'error', handleAudioError, false );
-            player.audio.addEventListener( 'canplaythrough', function(e) {
-
-                waveform.color = workspaceStyle.color;
-                waveform.backgroundColor = workspaceStyle.backgroundColor;
-                waveform.generate( player.getPath(), function(){
-                    updateMarker();
-                });
-
-                element.addEventListener( 'click', handleMouseDown, false );
-                element.addEventListener( 'mousewheel', handleMouseWheel, false );
-                //element.addEventListener( 'focus', function(e) trace(e) , false );
-                //element.addEventListener( 'blur', function(e) handleClickVideo(e) , false );
-
-            }, false );
-            */
-
-            window.addEventListener( 'resize', handleResize, false );
-
         }, false );
+        */
 	}
 
 	public function serialize() {
@@ -131,6 +109,7 @@ class VideoPlayer {
     }
 
 	public function dispose() {
+        element.removeEventListener( 'mousewheel', handleMouseWheel );
 		video.pause();
         video.remove();
         video = null;
@@ -151,53 +130,37 @@ class VideoPlayer {
     }
 
     public function getURI() {
-        //getURI: -> encodeURI(@getPath()).replace(/#/g, '%23').replace(/\?/g, '%3F')
-        //return "abc";// file.getPath().urlEncode();
-        //return "file://" + encodeURI(file.getPath().replace(/\\/g, '/')).replace(/#/g, '%23').replace(/\?/g, '%3F')
         return "file://" + file.getPath().urlEncode();
     }
 
+    /*
     public function isEqual( other ) {
         if( !Std.is( other, VideoPlayer ) )
             return false;
         return getURI() == cast( other, VideoPlayer ).getURI();
     }
+    */
 
     function seek( time : Float ) : Float {
         if( video.currentTime != null ) video.currentTime += time;
         return video.currentTime;
     }
 
+    function handleCanPlayThrough(e) {
+        video.removeEventListener( 'canplaythrough', handleCanPlayThrough );
+        element.addEventListener( 'mousewheel', handleMouseWheel, false );
+    }
+
     /*
-    function setAudioPositionFromPanePosition( x : Int ) {
-        //audio.currentTime = audio.duration * (x / element.offsetWidth);
-    }
-    */
-
-    function handleAudioPlaying(e) {
-        //trace(e);
-    }
-
-    function handleAudioEnded(e) {
-    }
-
-    function handleAudioError(e) {
-    }
-
     function handleMouseDown(e) {
-        //setAudioPositionFromPanePosition( e.layerX  );
-        //element.addEventListener( 'mouseup', handleMouseUp, false );
-        //element.addEventListener( 'mousemove', handleMouseMove, false );
-        //element.addEventListener( 'mouseout', handleMouseOut, false );
     }
 
     function handleMouseUp(e) {
-        //stopMouseSeek();
     }
 
     function handleMouseOut(e) {
-        //stopMouseSeek();
     }
+    */
 
     function handleMouseWheel(e) {
         var v = e.wheelDelta / 100 * wheelSpeed;
@@ -208,6 +171,8 @@ class VideoPlayer {
         seek( v );
     }
 
+    /*
     function handleResize(e) {
     }
+    */
 }
