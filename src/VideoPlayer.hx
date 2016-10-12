@@ -64,8 +64,10 @@ class VideoPlayer {
 	var file : atom.File;
     var element : DivElement;
     var video : VideoElement;
+    var seekSpeed : Float;
     var wheelSpeed : Float;
     var isPlaying : Bool;
+    var commands : CompositeDisposable;
 
 	function new( state ) {
 
@@ -74,6 +76,7 @@ class VideoPlayer {
 		this.file = new File( state.path );
 
         //seekSpeed = config.get( 'audioplayer.seek_speed' );
+        seekSpeed = 1;
         wheelSpeed = 1; //config.get( 'audioplayer.wheel_speed' );
 
         var workspaceStyle = window.getComputedStyle( Atom.views.getView( Atom.workspace ) );
@@ -98,15 +101,13 @@ class VideoPlayer {
 
         //element.addEventListener( 'DOMNodeInserted', function(){
 
-        /*
-        Atom.commands.add( element, 'videoplayer:toggle-playback', function(e) togglePlayback() );
-        Atom.commands.add( element, 'videoplayer:toggle-mute', function(e) toggleMute() );
-        Atom.commands.add( element, 'videoplayer:seek-backward', function(e) seek( -(video.duration / 10 * seekSpeed) ) );
-        Atom.commands.add( element, 'videoplayer:seek-forward', function(e) seek( (video.duration / 10 * seekSpeed) ) );
-        Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 );
-        Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration );
-        */
-
+        commands = new CompositeDisposable();
+        commands.add( Atom.commands.add( element, 'videoplayer:toggle-playback', function(e) togglePlayback() ) );
+        commands.add( Atom.commands.add( element, 'videoplayer:toggle-mute', function(e) toggleMute() ) );
+        commands.add( Atom.commands.add( element, 'videoplayer:seek-backward', function(e) seek( -(video.duration / 10 * seekSpeed) ) ) );
+        commands.add( Atom.commands.add( element, 'videoplayer:seek-forward', function(e) seek( (video.duration / 10 * seekSpeed) ) ) );
+        commands.add( Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 ) );
+        commands.add( Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration ) );
 	}
 
 	public function serialize() {
@@ -120,6 +121,8 @@ class VideoPlayer {
     }
 
 	public function dispose() {
+
+        commands.dispose();
 
         element.removeEventListener( 'mousewheel', handleMouseWheel );
 

@@ -6,11 +6,3 @@
     'up':           'videoplayer:goto-start'
     'down':         'videoplayer:goto-end'
     'm':            'videoplayer:toggle-mute'
-
-'.platform-linux,.platform-win32 .videoplayer':
-    'ctrl-left':    'videoplayer:seek-backward-fast'
-    'ctrl-right':   'videoplayer:seek-forward-fast'
-
-'.platform-darwin .videoplayer':
-    'cmd-left':    'videoplayer:seek-backward-fast'
-    'cmd-right':   'videoplayer:seek-forward-fast'
