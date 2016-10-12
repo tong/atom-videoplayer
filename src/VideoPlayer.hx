@@ -37,6 +37,10 @@ class VideoPlayer {
             if( Std.is( item, VideoPlayer ) ) {
                 var player : VideoPlayer = item;
                 statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight;
+                statusbar.show();
+            } else {
+                statusbar.text = '';
+                statusbar.hide();
             }
         });
     }
@@ -81,6 +85,7 @@ class VideoPlayer {
 
 		this.file = new File( state.path );
 
+        isPlaying = false;
         //seekSpeed = config.get( 'audioplayer.seek_speed' );
         seekSpeed = 1;
         wheelSpeed = 1; //config.get( 'audioplayer.wheel_speed' );
@@ -94,7 +99,7 @@ class VideoPlayer {
 		video = document.createVideoElement();
         video.controls = true;
         video.src = file.getPath();
-        if( state.play != null ) video.autoplay = state.play;
+        //if( state.play != null ) video.autoplay = state.play;
         if( state.time != null ) video.currentTime = state.time;
         if( state.volume != null ) video.volume = state.volume;
         element.appendChild( video );
@@ -114,6 +119,8 @@ class VideoPlayer {
         commands.add( Atom.commands.add( element, 'videoplayer:seek-forward', function(e) seek( (video.duration / 10 * seekSpeed) ) ) );
         commands.add( Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 ) );
         commands.add( Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration ) );
+
+        if( state.play != null ) play();
 	}
 
 	public function serialize() {
@@ -135,9 +142,9 @@ class VideoPlayer {
         video.removeEventListener( 'playing', handleVideoPlay );
         video.removeEventListener( 'ended', handleVideoEnd );
         video.removeEventListener( 'error', handleVideoError );
-        video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
         video.removeEventListener( 'click', handleVideoClick );
         video.removeEventListener( 'loadedmetadata', function(e) trace(e), false );
+
 		video.pause();
         video.remove();
         video = null;
