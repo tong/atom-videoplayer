@@ -23,6 +23,7 @@ class VideoPlayer {
 	static var allowedFileTypes = ['3gp','avi','mov','mp4','m4v','mkv','ogv','ogm','webm'];
 
     static var disposables : CompositeDisposable;
+    static var statusbar : Statusbar;
 
     static function activate( state : Dynamic ) {
 
@@ -31,6 +32,14 @@ class VideoPlayer {
         disposables = new CompositeDisposable();
 
 		disposables.add( Atom.workspace.addOpener( openURI ) );
+
+        Atom.workspace.onDidChangeActivePaneItem( function(item){
+            trace(item);
+            if( Std.is( item, VideoPlayer ) ) {
+                var player : VideoPlayer = item;
+                statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight;
+            }
+        });
     }
 
     static function deactivate() {
@@ -52,7 +61,7 @@ class VideoPlayer {
     }
 
     static function consumeStatusBar( pane ) {
-        //pane.addRightTile( { item: new Statusbar().element, priority:0 } );
+        pane.addRightTile( { item: statusbar = new Statusbar(), priority: 100 } );
     }
 
     static function deserialize( state : Dynamic ) {
@@ -131,6 +140,7 @@ class VideoPlayer {
         video.removeEventListener( 'error', handleVideoError );
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
         video.removeEventListener( 'click', handleVideoClick );
+        video.removeEventListener( 'loadedmetadata', function(e) trace(e), false );
 		video.pause();
         video.remove();
         video = null;
@@ -202,8 +212,11 @@ class VideoPlayer {
     }
 
     function handleVideoCanPlay(e) {
+
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
         element.addEventListener( 'mousewheel', handleMouseWheel, false );
+
+        statusbar.text = video.videoWidth+'x'+video.videoHeight;
     }
 
     function handleVideoPlay(e) {
@@ -215,6 +228,7 @@ class VideoPlayer {
     }
 
     function handleVideoError(e) {
+        trace(e);
     }
 
     function handleVideoClick(e) {
