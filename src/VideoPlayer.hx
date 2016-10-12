@@ -40,8 +40,12 @@ class VideoPlayer {
     static function openURI( uri : String ) {
         var ext = uri.extension().toLowerCase();
         if( allowedFileTypes.has( ext ) ) {
-            //return new VideoPlayer( uri, Atom.config.get( 'videoautoplay' ) );
-            return new VideoPlayer( { path: uri, play: Atom.config.get( 'video.autoplay' ), time: null } );
+            return new VideoPlayer( {
+                path: uri,
+                play: Atom.config.get( 'video.autoplay' ),
+                time: null,
+                volume : Atom.config.get( 'video.volume' )
+            } );
         }
         return null;
     }
@@ -60,9 +64,10 @@ class VideoPlayer {
     var element : DivElement;
     var video : VideoElement;
     var wheelSpeed : Float;
-    var animationFrameId : Int;
 
 	function new( state ) {
+
+        trace(state);
 
 		this.file = new File( state.path );
 
@@ -80,6 +85,7 @@ class VideoPlayer {
         video.src = file.getPath();
         if( state.play != null ) video.autoplay = state.play;
         if( state.time != null ) video.currentTime = state.time;
+        if( state.volume != null ) video.volume = state.volume;
         element.appendChild( video );
 
         element.addEventListener( 'DOMNodeInserted', function(){
@@ -119,7 +125,8 @@ class VideoPlayer {
             deserializer: 'VideoPlayer',
             path: file.getPath(),
             play: !video.paused,
-            time: video.currentTime
+            time: video.currentTime,
+            volume: video.volume
         }
     }
 
@@ -156,19 +163,6 @@ class VideoPlayer {
         return getURI() == cast( other, VideoPlayer ).getURI();
     }
 
-    function update( time : Float ) {
-
-        animationFrameId = window.requestAnimationFrame( update );
-        updateMarker();
-
-        /*
-        ctx.fillStyle = '#fff';
-    	for( i in 0...frequencyData.length ) {
-			ctx.fillRect( i, 0, 1, frequencyData[i] / 256 * h );
-		}
-        */
-    }
-
     function seek( time : Float ) : Float {
         if( video.currentTime != null ) video.currentTime += time;
         return video.currentTime;
@@ -180,14 +174,8 @@ class VideoPlayer {
     }
     */
 
-    function updateMarker() {
-        var percentPlayed = video.currentTime / video.duration;
-        //marker.style.left = (percentPlayed * element.offsetWidth )+'px';
-    }
-
     function handleAudioPlaying(e) {
         //trace(e);
-        animationFrameId = window.requestAnimationFrame( update );
     }
 
     function handleAudioEnded(e) {
