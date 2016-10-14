@@ -176,18 +176,6 @@ class VideoPlayer {
     }
     */
 
-    inline function enterFullscreen() {
-        untyped video.webkitRequestFullscreen();
-    }
-
-    inline function exitFullscreen() {
-        untyped document.webkitExitFullscreen();
-    }
-
-    inline function toggleFullscreen() {
-        untyped document.webkitIsFullScreen ? exitFullscreen() : enterFullscreen();
-    }
-
     inline function togglePlayback() {
         isPlaying ? pause() : play();
     }
@@ -228,7 +216,8 @@ class VideoPlayer {
 
     function handleVideoEnd(e) {
         isPlaying = false;
-        if( untyped document.webkitIsFullScreen ) exitFullscreen();
+        if( Atom.isFullScreen() ) Atom.toggleFullScreen();
+        //if( untyped document.webkitIsFullScreen ) exitFullscreen();
     }
 
     function handleVideoError(e) {
@@ -236,7 +225,7 @@ class VideoPlayer {
     }
 
     function handleVideoClick(e) {
-        e.ctrlKey ? toggleFullscreen() : togglePlayback();
+        e.ctrlKey ? Atom.toggleFullScreen() : togglePlayback();
     }
 
     function handleMouseWheel(e) {
