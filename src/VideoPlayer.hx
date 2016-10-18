@@ -34,13 +34,15 @@ class VideoPlayer {
 		disposables.add( Atom.workspace.addOpener( openURI ) );
 
         Atom.workspace.onDidChangeActivePaneItem( function(item){
-            if( Std.is( item, VideoPlayer ) ) {
-                var player : VideoPlayer = item;
-                statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight;
-                statusbar.show();
-            } else {
-                statusbar.text = '';
-                statusbar.hide();
+            if( statusbar != null ) {
+                if( Std.is( item, VideoPlayer ) ) {
+                    var player : VideoPlayer = item;
+                    statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight;
+                    statusbar.show();
+                } else {
+                    statusbar.text = '';
+                    statusbar.hide();
+                }
             }
         });
     }
