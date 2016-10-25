@@ -16,18 +16,15 @@ using haxe.io.Path;
 @:expose
 class VideoPlayer {
 
-    static inline function __init__() {
-        untyped module.exports = VideoPlayer;
-    }
+    static inline function __init__() untyped module.exports = VideoPlayer;
 
 	static var allowedFileTypes = ['3gp','avi','mov','mp4','m4v','mkv','ogv','ogm','webm'];
-
     static var disposables : CompositeDisposable;
     static var statusbar : Statusbar;
 
     static function activate( state : Dynamic ) {
 
-        trace( 'Atom-videoplayer ' );
+        trace( 'Atom-videoplayer' );
 
         disposables = new CompositeDisposable();
 
@@ -38,13 +35,18 @@ class VideoPlayer {
                 if( Std.is( item, VideoPlayer ) ) {
                     var player : VideoPlayer = item;
                     Fs.stat( player.file.getPath(), function(e,stat){
-                        var mb = Std.int( stat.size / 1000000.0 );
-                        statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight + ' ' +mb + 'mb';
-                        statusbar.show();
+                        if( e != null ) {
+                            statusbar.hide();
+                            statusbar.text = '';
+                        } else {
+                            var mb = Std.int( stat.size / 1000000.0 );
+                            statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight + ' ' +mb + 'mb';
+                            statusbar.show();
+                        }
                     });
                 } else {
-                    statusbar.text = '';
                     statusbar.hide();
+                    statusbar.text = '';
                 }
             }
         });
@@ -52,7 +54,7 @@ class VideoPlayer {
 
     static function deactivate() {
         disposables.dispose();
-        //statusbar.dispose();
+        if( statusbar != null ) statusbar.dispose();
     }
 
     static function openURI( uri : String ) {
@@ -72,7 +74,7 @@ class VideoPlayer {
         pane.addRightTile( { item: statusbar = new Statusbar(), priority: 100 } );
     }
 
-    static function deserialize( state : Dynamic ) {
+    static function deserialize( state ) {
         return new VideoPlayer( state );
     }
 
@@ -90,14 +92,11 @@ class VideoPlayer {
 
 		this.file = new File( state.path );
 
-        //Fs.stat();
-
         isPlaying = false;
-        //seekSpeed = config.get( 'audioplayer.seek_speed' );
-        seekSpeed = 1;
+        seekSpeed = 1; // config.get( 'audioplayer.seek_speed' );
         wheelSpeed = 1; //config.get( 'audioplayer.wheel_speed' );
 
-        var workspaceStyle = window.getComputedStyle( Atom.views.getView( Atom.workspace ) );
+        //var workspaceStyle = window.getComputedStyle( Atom.views.getView( Atom.workspace ) );
 
         element = document.createDivElement();
         element.classList.add( 'videoplayer' );
@@ -106,18 +105,15 @@ class VideoPlayer {
 		video = document.createVideoElement();
         video.controls = true;
         video.src = file.getPath();
-        //if( state.play != null ) video.autoplay = state.play;
         if( state.time != null ) video.currentTime = state.time;
         if( state.volume != null ) video.volume = state.volume;
         element.appendChild( video );
 
+        video.addEventListener( 'canplaythrough', handleVideoCanPlay, false );
         video.addEventListener( 'playing', handleVideoPlay, false );
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
-        video.addEventListener( 'canplaythrough', handleVideoCanPlay, false );
         video.addEventListener( 'click', handleVideoClick, false );
-
-        //element.addEventListener( 'DOMNodeInserted', function(){
 
         commands = new CompositeDisposable();
         commands.add( Atom.commands.add( element, 'videoplayer:toggle-playback', function(e) togglePlayback() ) );
@@ -127,7 +123,7 @@ class VideoPlayer {
         commands.add( Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 ) );
         commands.add( Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration ) );
 
-        if( state.play != null ) play();
+        if( state.play != null && state.play ) play();
 	}
 
 	public function serialize() {
@@ -224,15 +220,17 @@ class VideoPlayer {
     function handleVideoEnd(e) {
         isPlaying = false;
         if( Atom.isFullScreen() ) Atom.toggleFullScreen();
-        //if( untyped document.webkitIsFullScreen ) exitFullscreen();
     }
 
     function handleVideoError(e) {
         trace(e);
+        //video.classList.add( 'error' );
+        isPlaying = false;
+        if( Atom.isFullScreen() ) Atom.toggleFullScreen();
     }
 
     function handleVideoClick(e) {
-        e.ctrlKey ? Atom.toggleFullScreen() : togglePlayback();
+        //e.ctrlKey ? Atom.toggleFullScreen() : togglePlayback();
     }
 
     function handleMouseWheel(e) {

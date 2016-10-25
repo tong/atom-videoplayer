@@ -7,7 +7,7 @@ abstract Statusbar(DivElement) to DivElement {
 
 	public var text(get,set) : String;
 	inline function get_text() return this.textContent;
-	inline function set_text(s) return this.textContent = s;
+	inline function set_text(s:String) return this.textContent = s;
 
 	public inline function new() {
 
@@ -24,4 +24,9 @@ abstract Statusbar(DivElement) to DivElement {
 	public inline function hide() {
 		this.style.display = 'none';
 	}
+
+	public inline function dispose() {
+		this.remove();
+	}
+
 }

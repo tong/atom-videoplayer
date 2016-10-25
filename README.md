@@ -3,12 +3,19 @@
 
 [![Build Status](https://travis-ci.org/tong/atom-videoplayer.svg?branch=master)](https://travis-ci.org/tong/atom-videoplayer)
 
+Playback video files in an editor.
 
-Play video files in an editor.
 
-![Screenshot](https://raw.githubusercontent.com/tong/atom-videoplayer/master/screenshot.png)
+## Install
 
-### Supported Formats
+With the atom package manager:
+```shell
+apm install videoplayer
+```
+Or Settings ➔ Packages ➔ Search for `videoplayer`
+
+
+## Supported Formats
 * 3gp
 * avi
 * mov
@@ -18,3 +25,5 @@ Play video files in an editor.
 * ogv
 * ogm
 * webm
+
+![Screenshot](https://raw.githubusercontent.com/tong/atom-videoplayer/master/screenshot.png)
