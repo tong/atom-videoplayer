@@ -37,8 +37,11 @@ class VideoPlayer {
             if( statusbar != null ) {
                 if( Std.is( item, VideoPlayer ) ) {
                     var player : VideoPlayer = item;
-                    statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight;
-                    statusbar.show();
+                    Fs.stat( player.file.getPath(), function(e,stat){
+                        var mb = Std.int( stat.size / 1000000.0 );
+                        statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight + ' ' +mb + 'mb';
+                        statusbar.show();
+                    });
                 } else {
                     statusbar.text = '';
                     statusbar.hide();
@@ -86,6 +89,8 @@ class VideoPlayer {
 	function new( state ) {
 
 		this.file = new File( state.path );
+
+        //Fs.stat();
 
         isPlaying = false;
         //seekSpeed = config.get( 'audioplayer.seek_speed' );
