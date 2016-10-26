@@ -1,41 +1,53 @@
 {
   "name": "videoplayer",
   "main": "./lib/videoplayer",
-  "version": "0.6.5",
+  "version": "1.0.0",
   "description": "Playback video files",
   "consumedServices": {
-      "status-bar": { "versions": { "^1.0.0": "consumeStatusBar" } }
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
   },
-  "keywords": ["video","videoplayer","media","player","mp4","avi","webm","3gp","mov"],
+  "keywords": [
+    "video",
+    "videoplayer",
+    "media",
+    "player",
+    "mp4",
+    "avi",
+    "webm",
+    "3gp",
+    "mov"
+  ],
   "repository": "https://github.com/tong/atom-videoplayer",
   "license": "MIT",
   "engines": {
     "atom": ">=1.11.2 <2.0.0"
   },
-  "dependencies": {
-
-  },
+  "dependencies": {},
   "deserializers": {
-      "VideoPlayer": "deserialize"
+    "VideoPlayer": "deserialize"
   },
   "configSchema": {
-      "autoplay": {
-          "title": "Autoplay",
-          "description": "Autoplay video when opened",
-          "type": "boolean",
-          "default": true
-      },
-      "loop": {
-          "title": "Loop Video",
-          "type": "boolean",
-          "default": false
-      },
-      "volume": {
-          "title": "Default Volume",
-          "type": "number",
-          "default": 0.7,
-          "minimum": 0.0,
-          "maximum": 1.0
-      }
+    "autoplay": {
+      "title": "Autoplay",
+      "description": "Autoplay video when opened",
+      "type": "boolean",
+      "default": true
+    },
+    "loop": {
+      "title": "Loop Video",
+      "type": "boolean",
+      "default": false
+    },
+    "volume": {
+      "title": "Default Volume",
+      "type": "number",
+      "default": 0.7,
+      "minimum": 0,
+      "maximum": 1
+    }
   }
 }
