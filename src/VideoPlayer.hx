@@ -62,9 +62,10 @@ class VideoPlayer {
         if( allowedFileTypes.has( ext ) ) {
             return new VideoPlayer( {
                 path: uri,
-                play: Atom.config.get( 'videoplayer.autoplay' ),
                 time: null,
-                volume : Atom.config.get( 'videoplayer.volume' )
+                volume : Atom.config.get( 'videoplayer.volume' ),
+                play: Atom.config.get( 'videoplayer.autoplay' ),
+                mute: false,
             } );
         }
         return null;
@@ -80,7 +81,7 @@ class VideoPlayer {
 
     ////////////////////////////////////////////////////////////////////////////
 
-	var file : atom.File;
+	var file : File;
     var element : DivElement;
     var video : VideoElement;
     var isPlaying : Bool;
@@ -114,6 +115,7 @@ class VideoPlayer {
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
         video.addEventListener( 'click', handleVideoClick, false );
+        video.addEventListener( 'loadedmetadata', function(e) trace(e), false );
 
         commands = new CompositeDisposable();
         commands.add( Atom.commands.add( element, 'videoplayer:toggle-playback', function(e) togglePlayback() ) );
@@ -123,16 +125,18 @@ class VideoPlayer {
         commands.add( Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 ) );
         commands.add( Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration ) );
 
-        if( state.play != null && state.play ) play();
+        if( state.play ) play();
+        if( state.mute ) video.muted = true;
 	}
 
 	public function serialize() {
         return {
             deserializer: 'VideoPlayer',
             path: file.getPath(),
-            play: !video.paused,
             time: video.currentTime,
-            volume: video.volume
+            volume: video.volume,
+            play: !video.paused,
+            mute: video.muted
         }
     }
 
@@ -142,11 +146,12 @@ class VideoPlayer {
 
         element.removeEventListener( 'mousewheel', handleMouseWheel );
 
+        video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
         video.removeEventListener( 'playing', handleVideoPlay );
         video.removeEventListener( 'ended', handleVideoEnd );
         video.removeEventListener( 'error', handleVideoError );
         video.removeEventListener( 'click', handleVideoClick );
-        video.removeEventListener( 'loadedmetadata', function(e) trace(e), false );
+        //video.removeEventListener( 'loadedmetadata', function(e) trace(e), false );
 
 		video.pause();
         video.remove();
