@@ -7,6 +7,8 @@ import js.node.Fs;
 import atom.CompositeDisposable;
 import atom.Disposable;
 import atom.File;
+import Atom.config;
+import Atom.workspace;
 
 using Lambda;
 using StringTools;
@@ -28,9 +30,9 @@ class VideoPlayer {
 
         disposables = new CompositeDisposable();
 
-		disposables.add( Atom.workspace.addOpener( openURI ) );
+		disposables.add( workspace.addOpener( openURI ) );
 
-        Atom.workspace.onDidChangeActivePaneItem( function(item){
+        workspace.onDidChangeActivePaneItem( function(item){
             if( statusbar != null ) {
                 if( Std.is( item, VideoPlayer ) ) {
                     var player : VideoPlayer = item;
@@ -63,8 +65,8 @@ class VideoPlayer {
             return new VideoPlayer( {
                 path: uri,
                 time: null,
-                volume : Atom.config.get( 'videoplayer.volume' ),
-                play: Atom.config.get( 'videoplayer.autoplay' ),
+                volume : config.get( 'videoplayer.playback.volume' ),
+                play: config.get( 'videoplayer.playback.autoplay' ),
                 mute: false,
             } );
         }
@@ -103,6 +105,10 @@ class VideoPlayer {
         element.classList.add( 'videoplayer' );
         element.setAttribute( 'tabindex', '-1' );
 
+        if( !config.get( 'videoplayer.background.transparent' ) ) {
+            element.style.background = config.get( 'videoplayer.background.color' ).toHexString();
+        }
+
 		video = document.createVideoElement();
         video.controls = true;
         video.src = file.getPath();
@@ -115,7 +121,7 @@ class VideoPlayer {
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
         video.addEventListener( 'click', handleVideoClick, false );
-        video.addEventListener( 'loadedmetadata', function(e) trace(e), false );
+        //video.addEventListener( 'loadedmetadata', function(e) trace(e), false );
 
         commands = new CompositeDisposable();
         commands.add( Atom.commands.add( element, 'videoplayer:toggle-playback', function(e) togglePlayback() ) );
@@ -176,14 +182,6 @@ class VideoPlayer {
         return "file://" + file.getPath().urlEncode();
     }
 
-    /*
-    public function isEqual( other ) {
-        if( !Std.is( other, VideoPlayer ) )
-            return false;
-        return getURI() == cast( other, VideoPlayer ).getURI();
-    }
-    */
-
     inline function togglePlayback() {
         isPlaying ? pause() : play();
     }
@@ -220,6 +218,7 @@ class VideoPlayer {
     }
 
     function handleVideoPlay(e) {
+        isPlaying = true;
     }
 
     function handleVideoEnd(e) {
