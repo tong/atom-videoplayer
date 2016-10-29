@@ -125,11 +125,15 @@ class VideoPlayer {
 
         commands = new CompositeDisposable();
         commands.add( Atom.commands.add( element, 'videoplayer:toggle-playback', function(e) togglePlayback() ) );
-        commands.add( Atom.commands.add( element, 'videoplayer:toggle-mute', function(e) toggleMute() ) );
-        commands.add( Atom.commands.add( element, 'videoplayer:seek-backward', function(e) seek( -(video.duration / 10 * seekSpeed) ) ) );
-        commands.add( Atom.commands.add( element, 'videoplayer:seek-forward', function(e) seek( (video.duration / 10 * seekSpeed) ) ) );
+        commands.add( Atom.commands.add( element, 'videoplayer:seek-backward', function(e) {
+            seek( -calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
+        } ) );
+        commands.add( Atom.commands.add( element, 'videoplayer:seek-forward', function(e) {
+            seek( calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
+        } ) );
         commands.add( Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 ) );
         commands.add( Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration ) );
+        commands.add( Atom.commands.add( element, 'videoplayer:toggle-mute', function(e) toggleMute() ) );
 
         if( state.play ) play();
         if( state.mute ) video.muted = true;
@@ -207,6 +211,13 @@ class VideoPlayer {
     function seek( time : Float ) : Float {
         if( video.currentTime != null ) video.currentTime += time;
         return video.currentTime;
+    }
+
+    function calcSeekValue( fast = false, factor = 100, min = 1, max = 30 ) {
+        var v = video.duration / factor;
+        v = Math.min( max, Math.max( min, v ) );
+        if( fast) v *= 3;
+        return v;
     }
 
     function handleVideoCanPlay(e) {
