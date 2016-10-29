@@ -1,3 +1,6 @@
+## 1.1.1
+- Fix video playback stop on pane move
+
 ## 1.1.0
 - Serialize mute/unmute
 - Configureable background color
