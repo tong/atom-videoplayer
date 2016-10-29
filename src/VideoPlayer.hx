@@ -116,6 +116,8 @@ class VideoPlayer {
         if( state.volume != null ) video.volume = state.volume;
         element.appendChild( video );
 
+        element.addEventListener( 'DOMNodeInserted', handleInsertDOM, false );
+
         video.addEventListener( 'canplaythrough', handleVideoCanPlay, false );
         video.addEventListener( 'playing', handleVideoPlay, false );
         video.addEventListener( 'ended', handleVideoEnd, false );
@@ -155,6 +157,7 @@ class VideoPlayer {
         commands.dispose();
 
         element.removeEventListener( 'mousewheel', handleMouseWheel );
+        element.removeEventListener( 'DOMNodeInserted', handleInsertDOM );
 
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
         video.removeEventListener( 'playing', handleVideoPlay );
@@ -208,8 +211,8 @@ class VideoPlayer {
         }
     }
 
-    function seek( time : Float ) : Float {
-        if( video.currentTime != null ) video.currentTime += time;
+    function seek( secs : Float ) : Float {
+        if( video.currentTime != null ) video.currentTime += secs;
         return video.currentTime;
     }
 
@@ -218,6 +221,10 @@ class VideoPlayer {
         v = Math.min( max, Math.max( min, v ) );
         if( fast) v *= 3;
         return v;
+    }
+
+    function handleInsertDOM(e) {
+        if( isPlaying ) video.play();
     }
 
     function handleVideoCanPlay(e) {
