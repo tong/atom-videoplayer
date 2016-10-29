@@ -1,7 +1,7 @@
 {
   "name": "videoplayer",
   "main": "./lib/videoplayer",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Playback video files",
   "consumedServices": {
     "status-bar": {
@@ -31,55 +31,53 @@
     "VideoPlayer": "deserialize"
   },
   "configSchema": {
-      "playback": {
-          "type": "object",
-          "order": 1,
-          "properties": {
-              "volume": {
-                  "title": "Default Volume",
-                  "type": "number",
-                  "default": 0.7,
-                  "minimum": 0,
-                  "maximum": 1,
-                  "order": 1
-              },
-              "autoplay": {
-                "title": "Autoplay",
-                "description": "Autoplay video when opened",
-                "type": "boolean",
-                "default": true,
-                "order": 2
-              },
-              "loop": {
-                "title": "Loop",
-                "description": "Loop video forever",
-                "type": "boolean",
-                "default": false,
-                "order": 3
-              }
-          }
-      },
-
-  "background": {
+    "playback": {
+      "type": "object",
+      "order": 1,
+      "properties": {
+        "volume": {
+          "title": "Default Volume",
+          "type": "number",
+          "default": 0.7,
+          "minimum": 0,
+          "maximum": 1,
+          "order": 1
+        },
+        "autoplay": {
+          "title": "Autoplay",
+          "description": "Autoplay video when opened",
+          "type": "boolean",
+          "default": true,
+          "order": 2
+        },
+        "loop": {
+          "title": "Loop",
+          "description": "Loop video forever",
+          "type": "boolean",
+          "default": false,
+          "order": 3
+        }
+      }
+    },
+    "background": {
       "type": "object",
       "order": 2,
       "properties": {
-          "transparent": {
-              "title": "Transparent",
-              "description": "Use default background color",
-              "type": "boolean",
-              "default": true,
-              "order": 1
-          },
-          "color": {
-              "title": "Color",
-              "description": "Videoplayer pane background color",
-              "type": "color",
-              "default": "#000000",
-              "order": 2
-          }
+        "transparent": {
+          "title": "Transparent",
+          "description": "Use default background color",
+          "type": "boolean",
+          "default": true,
+          "order": 1
+        },
+        "color": {
+          "title": "Color",
+          "description": "Videoplayer pane background color",
+          "type": "color",
+          "default": "#000000",
+          "order": 2
+        }
       }
-  }
-
+    }
   }
 }
