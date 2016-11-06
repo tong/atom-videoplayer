@@ -175,18 +175,24 @@ class VideoPlayer {
         return file.getPath();
     }
 
-    /*
-    public function getIconName() {
-        return 'git-branch';
-    }
-    */
-
     public function getTitle() {
         return file.getBaseName();
     }
 
+	public function getIconName() {
+		return 'file-media';
+	}
+
     public function getURI() {
-        return "file://" + file.getPath().urlEncode();
+		return getPath();
+    }
+
+	public function getEncodedURI() {
+		return "file://" + getPath().urlEncode();
+    }
+
+	public function isEqual( other : Dynamic ) {
+		return Std.is( other, VideoPlayer );
     }
 
     inline function togglePlayback() {

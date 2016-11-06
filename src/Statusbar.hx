@@ -12,7 +12,7 @@ abstract Statusbar(DivElement) to DivElement {
 	public inline function new() {
 
 		this = document.createDivElement();
-		this.classList.add( 'status-bar-videoplayer', 'inline-block', 'icon', 'icon-device-camera-video'  );
+		this.classList.add( 'status-bar-videoplayer', 'inline-block', 'icon', 'file-media'  );
 
 		hide();
 	}
