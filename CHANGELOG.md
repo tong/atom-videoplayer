@@ -1,3 +1,6 @@
+## 1.1.3
+- Amend release
+
 ## 1.1.2
 - Set file-media icon name
 
