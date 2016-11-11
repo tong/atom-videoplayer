@@ -1,3 +1,6 @@
+## 1.2.0
+- Toggle playback on click
+
 ## 1.1.3
 - Amend release
 

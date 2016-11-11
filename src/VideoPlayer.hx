@@ -122,7 +122,11 @@ class VideoPlayer {
         video.addEventListener( 'playing', handleVideoPlay, false );
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
-        video.addEventListener( 'click', handleVideoClick, false );
+        //video.addEventListener( 'click', handleVideoClick, false );
+        //video.addEventListener( 'mousedown', handleMouseDown, false );
+        //video.addEventListener( 'mouseup', handleMouseUp, false );
+        //video.addEventListener( 'mouseout', handleMouseUp, false );
+        //video.addEventListener( 'mouseup', handleMouseUp, false );
         //video.addEventListener( 'loadedmetadata', function(e) trace(e), false );
 
         commands = new CompositeDisposable();
@@ -156,7 +160,6 @@ class VideoPlayer {
 
         commands.dispose();
 
-        element.removeEventListener( 'mousewheel', handleMouseWheel );
         element.removeEventListener( 'DOMNodeInserted', handleInsertDOM );
 
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
@@ -164,6 +167,7 @@ class VideoPlayer {
         video.removeEventListener( 'ended', handleVideoEnd );
         video.removeEventListener( 'error', handleVideoError );
         video.removeEventListener( 'click', handleVideoClick );
+        video.removeEventListener( 'mousewheel', handleMouseWheel );
         //video.removeEventListener( 'loadedmetadata', function(e) trace(e), false );
 
 		video.pause();
@@ -236,7 +240,8 @@ class VideoPlayer {
     function handleVideoCanPlay(e) {
 
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
-        element.addEventListener( 'mousewheel', handleMouseWheel, false );
+        video.addEventListener( 'click', handleVideoClick, false );
+        video.addEventListener( 'mousewheel', handleMouseWheel, false );
 
         statusbar.text = video.videoWidth+'x'+video.videoHeight;
     }
@@ -260,6 +265,24 @@ class VideoPlayer {
     function handleVideoClick(e) {
         togglePlayback();
     }
+
+    /*
+    function handleMouseDown(e) {
+        video.addEventListener( 'mousemove', handleMouseMove, false );
+    }
+
+    function handleMouseMove(e) {
+        trace(e);
+    }
+
+    function handleMouseUp(e) {
+        video.removeEventListener( 'mousemove', handleMouseMove, false );
+    }
+
+    function handleMouseOut(e) {
+        video.removeEventListener( 'mousemove', handleMouseMove, false );
+    }
+    */
 
     function handleMouseWheel(e) {
         var v = e.wheelDelta / 100 * wheelSpeed;
