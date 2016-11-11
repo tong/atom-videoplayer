@@ -258,7 +258,7 @@ class VideoPlayer {
     }
 
     function handleVideoClick(e) {
-        //e.ctrlKey ? Atom.toggleFullScreen() : togglePlayback();
+        togglePlayback();
     }
 
     function handleMouseWheel(e) {
