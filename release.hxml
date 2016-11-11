@@ -2,3 +2,5 @@ build.hxml
 --no-traces
 -lib closure
 -D closure_overwrite
+#-D closure_advanced
+#-D closure_prettyprint

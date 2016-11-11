@@ -1,5 +1,5 @@
 
-describe "Videoplayer", ->
+describe "VideoPlayer", ->
 
     describe "Empty test", ->
         it "Is always true", ->

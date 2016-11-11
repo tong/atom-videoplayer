@@ -1,3 +1,6 @@
+## 1.1.2
+- Set file-media icon name
+
 ## 1.1.1
 - Fix video playback stop on pane move
 
