@@ -1,4 +1,5 @@
 
+import js.Browser.console;
 import js.Browser.document;
 import js.Browser.window;
 import js.html.DivElement;
@@ -13,6 +14,12 @@ import Atom.workspace;
 using Lambda;
 using StringTools;
 using haxe.io.Path;
+
+private enum ScaleMode {
+	Fit;
+	Letterbox;
+	Original;
+}
 
 private abstract Statusbar(DivElement) to DivElement {
 
@@ -51,14 +58,9 @@ class VideoPlayer {
     static var statusbar : Statusbar;
 
     static function activate( state : Dynamic ) {
-
-        trace( 'Atom-videoplayer' );
-
         disposables = new CompositeDisposable();
-
 		disposables.add( workspace.addOpener( openURI ) );
-
-        workspace.onDidChangeActivePaneItem( function(item){
+        disposables.add( workspace.onDidChangeActivePaneItem( function(item){
             if( statusbar != null ) {
                 if( Std.is( item, VideoPlayer ) ) {
                     var player : VideoPlayer = item;
@@ -81,7 +83,7 @@ class VideoPlayer {
                     statusbar.text = '';
                 }
             }
-        });
+        }));
     }
 
     static function deactivate() {
@@ -111,11 +113,29 @@ class VideoPlayer {
     static function deserialize( state )
         return new VideoPlayer( state );
 
+	static function provideControls() {
+		///TODO
+		return {
+			mute: function(){
+			},
+			unmute: function(){
+			},
+			volume: function(v:Float){
+			},
+			seek: function(v:Float){
+			},
+			rate: function(v:Float){
+			},
+			pause: function(){
+			}
+		}
+	}
+
 	var file : File;
     var element : DivElement;
     var video : VideoElement;
     //var info : DivElement;
-    var isPlaying = false;
+	var isPlaying = false;
     var seekSpeed : Float;
     var wheelSpeed : Float;
     var commands : CompositeDisposable;
@@ -140,12 +160,7 @@ class VideoPlayer {
 		video = document.createVideoElement();
         video.controls = true;
         video.src = file.getPath();
-        if( state != null ) {
-            if( state.time != null ) video.currentTime = state.time;
-            if( state.volume != null ) video.volume = state.volume;
-        }
         element.appendChild( video );
-        //video.playbackRate = 3.0;++
 
         element.addEventListener( 'DOMNodeInserted', handleInsertDOM, false );
 
@@ -161,7 +176,7 @@ class VideoPlayer {
         //video.addEventListener( 'loadedmetadata', function(e) trace(e) );
         //video.addEventListener( 'durationchange', function(e) trace(e) );
 
-	//	trace( video );
+		//trace( video );
         //info = document.createDivElement();
         //info.classList.add( 'info' );
         //info.textContent = 'INFO';
@@ -183,6 +198,8 @@ class VideoPlayer {
         addCommand( 'toggle-playback', togglePlayback );
 
         if( state != null ) {
+			if( state.time != null ) video.currentTime = state.time;
+            if( state.volume != null ) video.volume = state.volume;
             if( state.play ) play();
             if( state.mute ) video.muted = true;
         }
@@ -237,16 +254,32 @@ class VideoPlayer {
 	public function isEqual( other : Dynamic )
 		return Std.is( other, VideoPlayer );
 
+	/*
+	public function setScaleMode( mode : ScaleMode ) {
+		switch mode {
+		case Fit:
+			//video.style.width = '100%';
+			//video.style.height = '100%';
+			//video.style.minWidth = '100%';
+		//	video.style.minHeight = '100%';
+		case Letterbox:
+			//video.style.minWidth = null;
+			//video.style.minHeight = null;
+		case Original:
+			video.style.width = video.videoWidth+'px';
+			video.style.height = video.videoHeight+'px';
+			video.style.top = '50%';
+			video.style.left = '50%';
+			video.style.transform = 'translate(-50%,-50%)';
+		}
+	}
+	*/
 
     inline function togglePlayback()
         isPlaying ? pause() : play();
 
     inline function toggleMute()
         video.muted = !video.muted;
-
-	function addCommand<T:haxe.Constraints.Function>( name : String, fn : T ) {
-		commands.add( Atom.commands.add( '.videoplayer', 'videoplayer:$name', fn ) );
-	}
 
     function play() {
         if( !isPlaying ) {
@@ -274,17 +307,21 @@ class VideoPlayer {
         return v;
     }
 
+	function addCommand<T:haxe.Constraints.Function>( name : String, fn : T ) {
+		commands.add( Atom.commands.add( '.videoplayer', 'videoplayer:$name', fn ) );
+	}
+
     function handleInsertDOM(e) {
         if( isPlaying ) video.play();
     }
 
     function handleVideoCanPlay(e) {
 
-        video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
+		//setScaleMode( Original );
 
+        video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
 		video.addEventListener( 'click', handleVideoClick, false );
         video.addEventListener( 'mousewheel', handleMouseWheel, false );
-
         statusbar.text = video.videoWidth+'x'+video.videoHeight;
     }
 

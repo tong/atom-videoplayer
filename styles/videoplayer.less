@@ -15,6 +15,13 @@
 
 .videoplayer {
 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1;
+
     video {
 
         // SEE: https://gist.github.com/afabbro/3759334
@@ -22,7 +29,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        display: none;
+        z-index: 10;
 
         &::-webkit-full-screen {
             width: 100%;
@@ -31,6 +38,7 @@
 
         &::-webkit-media-controls-panel {
 
+            //display: flex !important;
             position: absolute;
             width: 100%;
             bottom: 4px;
@@ -53,6 +61,14 @@
             background-color: @background-color-error;
         }
         */
+    }
+
+    .info {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+
     }
 }
 
