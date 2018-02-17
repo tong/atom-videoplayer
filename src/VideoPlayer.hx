@@ -62,13 +62,15 @@ class VideoPlayer {
     static function openURI( uri : String ) {
         var ext = uri.extension().toLowerCase();
         if( allowedFileTypes.has( ext ) ) {
-            return new VideoPlayer( {
+            var player = new VideoPlayer( {
                 path: uri,
                 time: null,
                 volume : config.get( 'videoplayer.playback.volume' ),
                 play: config.get( 'videoplayer.playback.autoplay' ),
                 mute: false,
             } );
+            disposables.add( cast player );
+            return player;
         }
         return null;
     }
@@ -81,8 +83,6 @@ class VideoPlayer {
         return new VideoPlayer( state );
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-
 	var file : File;
     var element : DivElement;
     var video : VideoElement;
@@ -91,7 +91,13 @@ class VideoPlayer {
     var wheelSpeed : Float;
     var commands : CompositeDisposable;
 
+    function addCommand<T:haxe.Constraints.Function>( name : String, fn : T ) {
+        commands.add( Atom.commands.add( '.videoplayer', 'videoplayer:$name', fn ) );
+    }
+
 	function new( state ) {
+
+        //super( function(){});
 
 		this.file = new File( state.path );
 
@@ -130,16 +136,18 @@ class VideoPlayer {
         //video.addEventListener( 'loadedmetadata', function(e) trace(e), false );
 
         commands = new CompositeDisposable();
-        commands.add( Atom.commands.add( element, 'videoplayer:toggle-playback', function(e) togglePlayback() ) );
-        commands.add( Atom.commands.add( element, 'videoplayer:seek-backward', function(e) {
+
+        addCommand( 'toggle-controls', e -> video.controls = !video.controls );
+        addCommand( 'toggle-mute', toggleMute );
+        addCommand( 'toggle-playback', togglePlayback );
+        addCommand( 'seek-backward', function(e){
             seek( -calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
-        } ) );
-        commands.add( Atom.commands.add( element, 'videoplayer:seek-forward', function(e) {
+        } );
+        addCommand( 'seek-forward', function(e) {
             seek( calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
-        } ) );
-        commands.add( Atom.commands.add( element, 'videoplayer:goto-start', function(e) video.currentTime = 0 ) );
-        commands.add( Atom.commands.add( element, 'videoplayer:goto-end', function(e) video.currentTime = video.duration ) );
-        commands.add( Atom.commands.add( element, 'videoplayer:toggle-mute', function(e) toggleMute() ) );
+        } );
+        addCommand( 'goto-start', e -> video.currentTime = 0 );
+        addCommand( 'goto-end', e -> video.currentTime = video.duration );
 
         if( state.play ) play();
         if( state.mute ) video.muted = true;
@@ -148,11 +156,11 @@ class VideoPlayer {
 	public function serialize() {
         return {
             deserializer: 'VideoPlayer',
+            mute: video.muted,
             path: file.getPath(),
-            time: video.currentTime,
-            volume: video.volume,
             play: !video.paused,
-            mute: video.muted
+            time: video.currentTime,
+            volume: video.volume
         }
     }
 
@@ -170,42 +178,35 @@ class VideoPlayer {
         video.removeEventListener( 'mousewheel', handleMouseWheel );
         //video.removeEventListener( 'loadedmetadata', function(e) trace(e), false );
 
+        video.style.display = 'none';
 		video.pause();
         video.remove();
         video = null;
 	}
 
-	public function getPath() {
+	public function getPath()
         return file.getPath();
-    }
 
-    public function getTitle() {
+    public function getTitle()
         return file.getBaseName();
-    }
 
-	public function getIconName() {
-		return 'file-media';
-	}
+	public function getIconName()
+        return 'file-media';
 
-    public function getURI() {
-		return getPath();
-    }
+    public function getURI()
+            return getPath();
 
-	public function getEncodedURI() {
-		return "file://" + getPath().urlEncode();
-    }
+	public function getEncodedURI()
+        return "file://" + getPath().urlEncode();
 
-	public function isEqual( other : Dynamic ) {
+	public function isEqual( other : Dynamic )
 		return Std.is( other, VideoPlayer );
-    }
 
-    inline function togglePlayback() {
+    inline function togglePlayback()
         isPlaying ? pause() : play();
-    }
 
-    inline function toggleMute() {
+    inline function toggleMute()
         video.muted = !video.muted;
-    }
 
     function play() {
         if( !isPlaying ) {
@@ -248,6 +249,7 @@ class VideoPlayer {
 
     function handleVideoPlay(e) {
         isPlaying = true;
+        video.style.display = 'inline-block';
     }
 
     function handleVideoEnd(e) {
@@ -269,10 +271,6 @@ class VideoPlayer {
     /*
     function handleMouseDown(e) {
         video.addEventListener( 'mousemove', handleMouseMove, false );
-    }
-
-    function handleMouseMove(e) {
-        trace(e);
     }
 
     function handleMouseUp(e) {

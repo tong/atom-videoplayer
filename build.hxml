@@ -1,5 +1,5 @@
 -js lib/videoplayer.js
--lib hxatom
+-lib atom
 -dce full
 -cp src
 VideoPlayer

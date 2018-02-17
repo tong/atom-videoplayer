@@ -1,6 +1,6 @@
 '.videoplayer':
     'space':        'videoplayer:toggle-playback'
-    'enter':        'videoplayer:toggle-playback'
+    'c':            'videoplayer:toggle-controls'
     'a':            'videoplayer:seek-backward'
     'd':            'videoplayer:seek-forward'
     'left':         'videoplayer:seek-backward'

@@ -24,7 +24,7 @@
   "repository": "https://github.com/tong/atom-videoplayer",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.11.0 <2.0.0"
+    "atom": ">=1.23.0 <2.0.0"
   },
   "dependencies": {},
   "deserializers": {
