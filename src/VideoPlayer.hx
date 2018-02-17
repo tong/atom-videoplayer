@@ -14,6 +14,32 @@ using Lambda;
 using StringTools;
 using haxe.io.Path;
 
+private abstract Statusbar(DivElement) to DivElement {
+
+	public var text(get,set) : String;
+	inline function get_text() return this.textContent;
+	inline function set_text(s:String) return this.textContent = s;
+
+	public inline function new() {
+		this = document.createDivElement();
+		this.classList.add( 'status-bar-videoplayer', 'inline-block', 'icon', 'file-media'  );
+		hide();
+	}
+
+	public inline function show() {
+		this.style.display = 'inline-block';
+	}
+
+	public inline function hide() {
+		this.style.display = 'none';
+	}
+
+	public inline function dispose() {
+		this.remove();
+	}
+
+}
+
 @:keep
 @:expose
 class VideoPlayer {
@@ -36,16 +62,20 @@ class VideoPlayer {
             if( statusbar != null ) {
                 if( Std.is( item, VideoPlayer ) ) {
                     var player : VideoPlayer = item;
+					/*
                     Fs.stat( player.file.getPath(), function(e,stat){
                         if( e != null ) {
                             statusbar.hide();
                             statusbar.text = '';
                         } else {
                             var mb = Std.int( stat.size / 1000000.0 );
-                            statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight + ' ' +mb + 'mb';
+                            statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight + ', ' +mb + 'mb';
                             statusbar.show();
                         }
                     });
+					*/
+					statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight;
+					statusbar.show();
                 } else {
                     statusbar.hide();
                     statusbar.text = '';
@@ -75,33 +105,25 @@ class VideoPlayer {
         return null;
     }
 
-    static function consumeStatusBar( pane ) {
-        pane.addRightTile( { item: statusbar = new Statusbar(), priority: 100 } );
-    }
+    static function consumeStatusBar( pane )
+        pane.addLeftTile( { item: statusbar = new Statusbar() } );
 
-    static function deserialize( state ) {
+    static function deserialize( state )
         return new VideoPlayer( state );
-    }
 
 	var file : File;
     var element : DivElement;
     var video : VideoElement;
-    var isPlaying : Bool;
+    //var info : DivElement;
+    var isPlaying = false;
     var seekSpeed : Float;
     var wheelSpeed : Float;
     var commands : CompositeDisposable;
 
-    function addCommand<T:haxe.Constraints.Function>( name : String, fn : T ) {
-        commands.add( Atom.commands.add( '.videoplayer', 'videoplayer:$name', fn ) );
-    }
-
 	function new( state ) {
-
-        //super( function(){});
 
 		this.file = new File( state.path );
 
-        isPlaying = false;
         seekSpeed = 1; // config.get( 'audioplayer.seek_speed' );
         wheelSpeed = 1; //config.get( 'audioplayer.wheel_speed' );
 
@@ -118,9 +140,12 @@ class VideoPlayer {
 		video = document.createVideoElement();
         video.controls = true;
         video.src = file.getPath();
-        if( state.time != null ) video.currentTime = state.time;
-        if( state.volume != null ) video.volume = state.volume;
+        if( state != null ) {
+            if( state.time != null ) video.currentTime = state.time;
+            if( state.volume != null ) video.volume = state.volume;
+        }
         element.appendChild( video );
+        //video.playbackRate = 3.0;++
 
         element.addEventListener( 'DOMNodeInserted', handleInsertDOM, false );
 
@@ -128,29 +153,39 @@ class VideoPlayer {
         video.addEventListener( 'playing', handleVideoPlay, false );
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
-        //video.addEventListener( 'click', handleVideoClick, false );
         //video.addEventListener( 'mousedown', handleMouseDown, false );
         //video.addEventListener( 'mouseup', handleMouseUp, false );
         //video.addEventListener( 'mouseout', handleMouseUp, false );
         //video.addEventListener( 'mouseup', handleMouseUp, false );
-        //video.addEventListener( 'loadedmetadata', function(e) trace(e), false );
+        //video.addEventListener( 'loadeddata', function(e) trace(e) );
+        //video.addEventListener( 'loadedmetadata', function(e) trace(e) );
+        //video.addEventListener( 'durationchange', function(e) trace(e) );
+
+	//	trace( video );
+        //info = document.createDivElement();
+        //info.classList.add( 'info' );
+        //info.textContent = 'INFO';
+        //element.appendChild( info );
 
         commands = new CompositeDisposable();
-
+        addCommand( 'goto-start', e -> video.currentTime = 0 );
+        addCommand( 'goto-end', e -> video.currentTime = video.duration );
+        addCommand( 'rate-increase', e -> video.playbackRate += 0.1 );
+        addCommand( 'rate-decrease', e -> video.playbackRate -= 0.1 );
         addCommand( 'toggle-controls', e -> video.controls = !video.controls );
-        addCommand( 'toggle-mute', toggleMute );
-        addCommand( 'toggle-playback', togglePlayback );
         addCommand( 'seek-backward', function(e){
             seek( -calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
         } );
         addCommand( 'seek-forward', function(e) {
             seek( calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
         } );
-        addCommand( 'goto-start', e -> video.currentTime = 0 );
-        addCommand( 'goto-end', e -> video.currentTime = video.duration );
+        addCommand( 'toggle-mute', toggleMute );
+        addCommand( 'toggle-playback', togglePlayback );
 
-        if( state.play ) play();
-        if( state.mute ) video.muted = true;
+        if( state != null ) {
+            if( state.play ) play();
+            if( state.mute ) video.muted = true;
+        }
 	}
 
 	public function serialize() {
@@ -176,7 +211,7 @@ class VideoPlayer {
         video.removeEventListener( 'error', handleVideoError );
         video.removeEventListener( 'click', handleVideoClick );
         video.removeEventListener( 'mousewheel', handleMouseWheel );
-        //video.removeEventListener( 'loadedmetadata', function(e) trace(e), false );
+        //video.removeEventListener( 'loadedmetadata', function(e) trace(e) );
 
         video.style.display = 'none';
 		video.pause();
@@ -202,11 +237,16 @@ class VideoPlayer {
 	public function isEqual( other : Dynamic )
 		return Std.is( other, VideoPlayer );
 
+
     inline function togglePlayback()
         isPlaying ? pause() : play();
 
     inline function toggleMute()
         video.muted = !video.muted;
+
+	function addCommand<T:haxe.Constraints.Function>( name : String, fn : T ) {
+		commands.add( Atom.commands.add( '.videoplayer', 'videoplayer:$name', fn ) );
+	}
 
     function play() {
         if( !isPlaying ) {
@@ -241,7 +281,8 @@ class VideoPlayer {
     function handleVideoCanPlay(e) {
 
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
-        video.addEventListener( 'click', handleVideoClick, false );
+
+		video.addEventListener( 'click', handleVideoClick, false );
         video.addEventListener( 'mousewheel', handleMouseWheel, false );
 
         statusbar.text = video.videoWidth+'x'+video.videoHeight;
@@ -258,7 +299,7 @@ class VideoPlayer {
     }
 
     function handleVideoError(e) {
-        trace(e);
+        console.error(e);
         //video.classList.add( 'error' );
         isPlaying = false;
         if( Atom.isFullScreen() ) Atom.toggleFullScreen();
