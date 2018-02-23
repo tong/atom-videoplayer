@@ -1,5 +1,9 @@
+## 1.3.0
+- Keyboard control improvements
+- Cleanup
+
 ## 1.2.0
-- Toggle playback on click
+- Mouse controls
 
 ## 1.1.3
 - Amend release

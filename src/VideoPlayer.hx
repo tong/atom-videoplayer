@@ -1,7 +1,6 @@
 
-import js.Browser.console;
 import js.Browser.document;
-import js.Browser.window;
+import js.Node.console;
 import js.html.DivElement;
 import js.html.VideoElement;
 import js.node.Fs;
@@ -44,7 +43,6 @@ private abstract Statusbar(DivElement) to DivElement {
 	public inline function dispose() {
 		this.remove();
 	}
-
 }
 
 @:keep
@@ -112,9 +110,10 @@ class VideoPlayer {
 
     static function deserialize( state )
         return new VideoPlayer( state );
-
+	
+	/*
+	///TODO
 	static function provideControls() {
-		///TODO
 		return {
 			mute: function(){
 			},
@@ -130,6 +129,7 @@ class VideoPlayer {
 			}
 		}
 	}
+	*/
 
 	var file : File;
     var element : DivElement;
@@ -161,7 +161,7 @@ class VideoPlayer {
         video.controls = true;
         video.src = file.getPath();
         element.appendChild( video );
-
+		
         element.addEventListener( 'DOMNodeInserted', handleInsertDOM, false );
 
         video.addEventListener( 'canplaythrough', handleVideoCanPlay, false );
@@ -176,7 +176,6 @@ class VideoPlayer {
         //video.addEventListener( 'loadedmetadata', function(e) trace(e) );
         //video.addEventListener( 'durationchange', function(e) trace(e) );
 
-		//trace( video );
         //info = document.createDivElement();
         //info.classList.add( 'info' );
         //info.textContent = 'INFO';
@@ -230,7 +229,6 @@ class VideoPlayer {
         video.removeEventListener( 'mousewheel', handleMouseWheel );
         //video.removeEventListener( 'loadedmetadata', function(e) trace(e) );
 
-        video.style.display = 'none';
 		video.pause();
         video.remove();
         video = null;
@@ -296,7 +294,7 @@ class VideoPlayer {
     }
 
     function seek( secs : Float ) : Float {
-        if( video.currentTime != null ) video.currentTime += secs;
+        if( secs != null && secs >= 0 && video.currentTime != null ) video.currentTime += secs;
         return video.currentTime;
     }
 
@@ -322,12 +320,12 @@ class VideoPlayer {
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
 		video.addEventListener( 'click', handleVideoClick, false );
         video.addEventListener( 'mousewheel', handleMouseWheel, false );
+		
         statusbar.text = video.videoWidth+'x'+video.videoHeight;
     }
 
     function handleVideoPlay(e) {
         isPlaying = true;
-        video.style.display = 'inline-block';
     }
 
     function handleVideoEnd(e) {
@@ -336,7 +334,8 @@ class VideoPlayer {
     }
 
     function handleVideoError(e) {
-        console.error(e);
+        console.error( e );
+		Atom.notifications.addError( 'Cannot play video: '+getPath() );
         //video.classList.add( 'error' );
         isPlaying = false;
         if( Atom.isFullScreen() ) Atom.toggleFullScreen();

@@ -15,17 +15,8 @@
 
 .videoplayer {
 
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    z-index: 1;
-
     video {
-
-        // SEE: https://gist.github.com/afabbro/3759334
-
+        
         position: absolute;
         width: 100%;
         height: 100%;
@@ -35,40 +26,28 @@
             width: 100%;
             height: 100%;
         }
-
+        
         &::-webkit-media-controls-panel {
-
-            //display: flex !important;
-            position: absolute;
-            width: 100%;
-            bottom: 4px;
-            left: 4px;
-
             background: none;
             opacity: 0.9;
         }
-        /*
-        &::-webkit-media-controls-fullscreen-button {
-            //display: none;
-        }
-        */
+        
         &::-webkit-media-controls-play-button {
             cursor: pointer;
+            color: red;
         }
-
-        /*
-        &.error {
-            background-color: @background-color-error;
+        
+        &::-webkit-media-controls-panel {
+            background: none;
+            opacity: 0.9;
         }
-        */
     }
-
+    
     .info {
         position: absolute;
         top: 10px;
         left: 10px;
         z-index: 1000;
-
     }
 }
 

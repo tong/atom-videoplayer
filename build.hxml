@@ -1,6 +1,6 @@
 -js lib/videoplayer.js
+VideoPlayer
 -lib atom
 -dce full
 -cp src
-VideoPlayer
 -D hxnodejs_no_version_warning
