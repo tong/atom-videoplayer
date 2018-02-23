@@ -182,11 +182,11 @@ class VideoPlayer {
         //element.appendChild( info );
 
         commands = new CompositeDisposable();
-        addCommand( 'goto-start', e -> video.currentTime = 0 );
-        addCommand( 'goto-end', e -> video.currentTime = video.duration );
-        addCommand( 'rate-increase', e -> video.playbackRate += 0.1 );
-        addCommand( 'rate-decrease', e -> video.playbackRate -= 0.1 );
-        addCommand( 'toggle-controls', e -> video.controls = !video.controls );
+        addCommand( 'goto-start', function(e) video.currentTime = 0 );
+        addCommand( 'goto-end', function(e) video.currentTime = video.duration );
+        addCommand( 'rate-increase', function(e) video.playbackRate += 0.1 );
+        addCommand( 'rate-decrease', function(e) video.playbackRate -= 0.1 );
+        addCommand( 'toggle-controls', function(e) video.controls = !video.controls );
         addCommand( 'seek-backward', function(e){
             seek( -calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
         } );
