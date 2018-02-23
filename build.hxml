@@ -3,4 +3,10 @@ VideoPlayer
 -lib atom
 -dce full
 -cp src
+#-debug
+--no-traces
 -D hxnodejs_no_version_warning
+#-lib closure
+#-D closure_overwrite
+#-D closure_advanced
+#-D closure_prettyprint
