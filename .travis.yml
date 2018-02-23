@@ -1,16 +1,27 @@
-language: objective-c
+language: haxe
+
+os:
+  - linux
+
+haxe:
+  - "3.4.6"
+  - development
+
+branches:
+  only:
+    - master
+    - dev
+
+matrix:
+  allow_failures:
+    - haxe: development
 
 notifications:
   email:
     on_success: never
     on_failure: change
 
-script: 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
-
-git:
-  depth: 10
-
-branches:
-  only:
-    - master
-    - dev
+script:
+    - haxelib git atom https://github.com/tong/hxatom
+    - haxe build.hxml
+    - curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh
