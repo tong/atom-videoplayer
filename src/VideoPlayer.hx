@@ -110,7 +110,7 @@ class VideoPlayer {
 
     static function deserialize( state )
         return new VideoPlayer( state );
-	
+
 	/*
 	///TODO
 	static function provideControls() {
@@ -161,7 +161,7 @@ class VideoPlayer {
         video.controls = true;
         video.src = file.getPath();
         element.appendChild( video );
-		
+
         element.addEventListener( 'DOMNodeInserted', handleInsertDOM, false );
 
         video.addEventListener( 'canplaythrough', handleVideoCanPlay, false );
@@ -320,8 +320,10 @@ class VideoPlayer {
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
 		video.addEventListener( 'click', handleVideoClick, false );
         video.addEventListener( 'mousewheel', handleMouseWheel, false );
-		
-        statusbar.text = video.videoWidth+'x'+video.videoHeight;
+
+		if( statusbar != null ) {
+			statusbar.text = video.videoWidth+'x'+video.videoHeight;
+		}
     }
 
     function handleVideoPlay(e) {
