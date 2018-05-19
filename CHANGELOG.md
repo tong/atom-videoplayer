@@ -1,6 +1,9 @@
-## 1.3.0
-- Keyboard control improvements
-- Cleanup
+
+## 1.2.4
+- Check if statusbar element exists on handleCanPlayVideo
+
+## 1.2.3
+- Unminified js code for error reports
 
 ## 1.2.0
 - Mouse controls
