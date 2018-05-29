@@ -1,4 +1,9 @@
 
+## 1.3.0
+- Fix loop video setting
+- Keymap changes
+- Context menu
+
 ## 1.2.4
 - Check if statusbar element exists on handleCanPlayVideo
 
