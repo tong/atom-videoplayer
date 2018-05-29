@@ -1,0 +1,7 @@
+'context-menu':
+    'div.videoplayer': [
+        { type: 'separator' },
+        { 'label': 'Play', 'command': 'videoplayer:toggle-playback' },
+        { 'label': 'Mute', 'command': 'videoplayer:toggle-mute' },
+        { type: 'separator' }
+    ]
