@@ -125,6 +125,8 @@ class VideoPlayer {
 			},
 			rate: function(v:Float){
 			},
+			play: function(){
+			}
 			pause: function(){
 			}
 		}
@@ -132,13 +134,13 @@ class VideoPlayer {
 	*/
 
 	var file : File;
-    var element : DivElement;
-    var video : VideoElement;
-    //var info : DivElement;
 	var isPlaying = false;
     var seekSpeed : Float;
     var wheelSpeed : Float;
     var commands : CompositeDisposable;
+	var element : DivElement;
+	var video : VideoElement;
+	//var info : DivElement;
 
 	function new( state ) {
 
@@ -190,21 +192,36 @@ class VideoPlayer {
 		});
         addCommand( 'rate-increase', function(e) video.playbackRate += 0.1 );
         addCommand( 'rate-decrease', function(e) video.playbackRate -= 0.1 );
+        addCommand( 'toggle-fullscreen', function(e) {
+			toggleFullscreen();
+		} );
         addCommand( 'toggle-controls', function(e) video.controls = !video.controls );
         addCommand( 'seek-backward', function(e){
-            seek( -calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
+			if( video != null )
+            	seek( -calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
         } );
         addCommand( 'seek-forward', function(e) {
-            seek( calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
+			if( video != null )
+            	seek( calcSeekValue( untyped e.originalEvent != null && e.originalEvent.shiftKey ) );
         } );
         addCommand( 'toggle-mute', toggleMute );
+        addCommand( 'volume-increase', function(e) {
+			if( video != null ) {
+				video.volume = Math.min( video.volume + 0.1, 1.0 );
+			}
+		} );
+        addCommand( 'volume-decrease', function(e) {
+			if( video != null ) {
+				video.volume = Math.max( video.volume - 0.1, 0.0 );
+			}
+		} );
         addCommand( 'toggle-playback', togglePlayback );
 
         if( state != null ) {
 			if( state.time != null ) video.currentTime = state.time;
             if( state.volume != null ) video.volume = state.volume;
+			if( state.mute ) video.muted = true;
             if( state.play ) play();
-            if( state.mute ) video.muted = true;
         }
 	}
 
@@ -313,6 +330,14 @@ class VideoPlayer {
 		commands.add( Atom.commands.add( '.videoplayer', 'videoplayer:$name', fn ) );
 	}
 
+	function toggleFullscreen() {
+		if( Atom.isFullScreen() ) {
+			untyped document.webkitExitFullscreen();
+		} else {
+			untyped video.webkitRequestFullscreen();
+		}
+	}
+
     function handleInsertDOM(e) {
         if( isPlaying ) video.play();
     }
@@ -336,15 +361,14 @@ class VideoPlayer {
 
     function handleVideoEnd(e) {
         isPlaying = false;
-        if( Atom.isFullScreen() ) Atom.toggleFullScreen();
+		if( config.get( 'videoplayer.playback.loop' ) ) play();
     }
 
     function handleVideoError(e) {
         console.error( e );
+		isPlaying = false;
+		//video.classList.add( 'error' );
 		Atom.notifications.addError( 'Cannot play video: '+getPath() );
-        //video.classList.add( 'error' );
-        isPlaying = false;
-        if( Atom.isFullScreen() ) Atom.toggleFullScreen();
     }
 
     function handleVideoClick(e) {
