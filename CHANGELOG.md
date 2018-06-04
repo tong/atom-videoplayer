@@ -1,4 +1,11 @@
 
+## 1.4.0
+- Bind commands to player instance
+- Take Screenshots
+
+## 1.3.1
+- Remove context menu
+
 ## 1.3.0
 - Fix loop video setting
 - Keymap changes
