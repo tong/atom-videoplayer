@@ -19,7 +19,11 @@
     "avi",
     "webm",
     "3gp",
-    "mov"
+    "mov",
+    "m4v",
+    "mkv",
+    "ogv",
+    "ogm"
   ],
   "repository": "https://github.com/tong/atom-videoplayer",
   "license": "MIT",

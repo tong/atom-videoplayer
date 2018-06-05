@@ -7,6 +7,8 @@
     'pagedown':     'videoplayer:seek-backward'
     'up':           'videoplayer:volume-increase'
     'down':         'videoplayer:volume-decrease'
+    '+':            'videoplayer:volume-increase'
+    '-':            'videoplayer:volume-decrease'
     'm':            'videoplayer:mute'
     'space':        'videoplayer:play'
     'enter':        'videoplayer:play'

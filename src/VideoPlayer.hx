@@ -31,34 +31,13 @@ class VideoPlayer {
         disposables = new CompositeDisposable();
 		disposables.add( workspace.addOpener( openURI ) );
         disposables.add( workspace.onDidChangeActivePaneItem( function(item){
-			if( Std.is( item, VideoPlayer ) ) {
+            if( Std.is( item, VideoPlayer ) ) {
 				var player : VideoPlayer = item;
-				statusbar.textContent = player.video.videoWidth+'x'+player.video.videoHeight;
+                var video = player.video;
+				statusbar.textContent = video.videoWidth+'x'+video.videoHeight;
 			} else {
 				statusbar.textContent = '';
 			}
-			/*
-            if( statusbar != null ) {
-                if( Std.is( item, VideoPlayer ) ) {
-                    var player : VideoPlayer = item;
-                    Fs.stat( player.file.getPath(), function(e,stat){
-                        if( e != null ) {
-                            statusbar.hide();
-                            statusbar.text = '';
-                        } else {
-                            var mb = Std.int( stat.size / 1000000.0 );
-                            statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight + ', ' +mb + 'mb';
-                            statusbar.show();
-                        }
-                    });
-					statusbar.text = player.video.videoWidth+'x'+player.video.videoHeight;
-					statusbar.show();
-                } else {
-                    statusbar.hide();
-                    statusbar.text = '';
-                }
-            }
-			*/
         }));
     }
 
@@ -87,32 +66,12 @@ class VideoPlayer {
     }
 
     static function consumeStatusBar( pane ) {
-		statusbar = document.createDivElement();
-		statusbar.classList.add( 'status-bar-videoplayer', 'inline-block' );
-		pane.addLeftTile( { item: statusbar } );
+        if( statusbar == null ) {
+            statusbar = document.createDivElement();
+            statusbar.classList.add( 'status-bar-videoplayer', 'inline-block' );
+            pane.addLeftTile( { item: statusbar } );
+        }
 	}
-
-	/*
-	//TODO
-	static function provideControls() {
-		return {
-			mute: function(){
-			},
-			unmute: function(){
-			},
-			volume: function(v:Float){
-			},
-			seek: function(v:Float){
-			},
-			rate: function(v:Float){
-			},
-			play: function(){
-			}
-			pause: function(){
-			}
-		}
-	}
-	*/
 
 	var file : File;
 	var element : DivElement;
@@ -146,13 +105,13 @@ class VideoPlayer {
         video.addEventListener( 'playing', handleVideoPlay, false );
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
+        //video.addEventListener( 'loadeddata', function(e) trace(e) );
+        //video.addEventListener( 'loadedmetadata', function(e) trace(e) );
+        //video.addEventListener( 'durationchange', function(e) trace(e) );
         //video.addEventListener( 'mousedown', handleMouseDown, false );
         //video.addEventListener( 'mouseup', handleMouseUp, false );
         //video.addEventListener( 'mouseout', handleMouseUp, false );
         //video.addEventListener( 'mouseup', handleMouseUp, false );
-        //video.addEventListener( 'loadeddata', function(e) trace(e) );
-        //video.addEventListener( 'loadedmetadata', function(e) trace(e) );
-        //video.addEventListener( 'durationchange', function(e) trace(e) );
 		//video.addEventListener( 'keydown', function(e) trace(e) );
 
         commands = new CompositeDisposable();
@@ -201,7 +160,7 @@ class VideoPlayer {
 			ctx.drawImage( video, 0, 0, canvas.width, canvas.height );
 			var dataURI = canvas.toDataURL( 'image/png' );
 			dataURI = dataURI.substr( 22 );
-			js.node.Fs.writeFile( 'screenshot_'+video.currentTime+'.png', dataURI, { encoding: 'base64' }, function(e){
+			Fs.writeFile( 'screenshot_'+video.currentTime+'.png', dataURI, { encoding: 'base64' }, function(e){
 				trace(e);
 			} );
 		} );
@@ -317,7 +276,7 @@ class VideoPlayer {
     }
 
     function handleVideoPlay(e) {
-        //isPlaying = true;
+        statusbar.textContent = video.videoWidth+'x'+video.videoHeight;
     }
 
     function handleVideoEnd(e) {
