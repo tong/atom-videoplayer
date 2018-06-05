@@ -1,0 +1,7 @@
+'context-menu':
+    'video': [
+        { type: 'separator' },
+        { label: 'Mute', command: 'videoplayer:mute' },
+        { label: 'Screenshot', command: 'videoplayer:screenshot' },
+        { type: 'separator' }
+    ]

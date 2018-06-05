@@ -171,9 +171,15 @@ class VideoPlayer {
 		} );
 		*/
 
-		//var _item = {};
-		//Reflect.setField( _item, '#'+elementId, [ { label: 'Mute', command: 'videoplayer:toggle-mute' } ] );
-		//var item = Atom.contextMenu.add( _item );
+        /*
+		var item = Atom.contextMenu.add( untyped {
+            'video': [
+                //{ label: 'Fullscreen', command: 'videoplayer:toggle-fullscreen' }, // TODO Not working ?
+                { label: 'Mute', command: 'videoplayer:mute' },
+                { label: 'Screenshot', command: 'videoplayer:screenshot' }
+            ]
+        } );
+        */
 
 		//TODO listen for config changes
 
