@@ -16,12 +16,14 @@ matrix:
   allow_failures:
     - haxe: development
 
+install:
+    - haxelib install atom
+
+script:
+    - haxe build.hxml
+    - curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh
+
 notifications:
   email:
     on_success: never
     on_failure: change
-
-script:
-    - haxelib git atom https://github.com/tong/hxatom
-    - haxe build.hxml
-    - curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh
