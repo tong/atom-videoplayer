@@ -12,10 +12,6 @@ branches:
     - master
     - dev
 
-matrix:
-  allow_failures:
-    - haxe: development
-
 install:
     - haxelib install atom
 
