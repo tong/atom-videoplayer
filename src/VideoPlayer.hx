@@ -18,15 +18,13 @@ using StringTools;
 using haxe.io.Path;
 
 @:keep
-@:expose
 class VideoPlayer {
-
-    static inline function __init__() untyped module.exports = VideoPlayer;
 
 	static var allowedFileTypes = ['3gp','avi','mov','mp4','m4v','mkv','ogv','ogm','webm'];
     static var disposables : CompositeDisposable;
 	static var statusbar : Element;
 
+    @:expose("activate")
     static function activate( state : Dynamic ) {
         disposables = new CompositeDisposable();
 		disposables.add( workspace.addOpener( openURI ) );
@@ -41,11 +39,13 @@ class VideoPlayer {
         }));
     }
 
+    @:expose("deactivate")
     static function deactivate() {
         disposables.dispose();
         if( statusbar != null ) statusbar.remove();
     }
 
+    @:expose("deserialize")
 	static function deserialize( state )
 		return new VideoPlayer( state );
 
@@ -65,6 +65,7 @@ class VideoPlayer {
         return null;
     }
 
+    @:expose("consumeStatusBar")
     static function consumeStatusBar( pane ) {
         if( statusbar == null ) {
             statusbar = document.createDivElement();
