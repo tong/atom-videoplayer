@@ -1,7 +1,11 @@
 
+## 1.4.1
+- Use @:expose("*") instead of module export
+
 ## 1.4.0
 - Bind commands to player instance
 - Take Screenshots
+- Context menu
 
 ## 1.3.1
 - Remove context menu
