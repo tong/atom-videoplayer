@@ -3,6 +3,6 @@ VideoPlayer
 -p src
 -L atom
 -dce full
--debug
 -D hxnodejs_no_version_warning
-#--no-traces
+#-debug
+--no-traces
