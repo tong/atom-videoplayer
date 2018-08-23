@@ -291,9 +291,9 @@ class VideoPlayer {
     }
 
     function handleVideoError(e) {
-		//video.classList.add( 'error' );
-		notifications.addError( 'Cannot play video: '+getPath() );
 		console.error( e );
+		//video.classList.add( 'error' );
+		notifications.addError( 'Cannot play video', { detail: getPath(), dismissable: true, icon: 'file-media' } );
     }
 
     function handleVideoClick(e) {
