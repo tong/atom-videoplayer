@@ -1,3 +1,5 @@
+## 1.4.2
+- Set error notification details, dismissable and icon
 
 ## 1.4.1
 - Use @:expose("*") instead of module export
