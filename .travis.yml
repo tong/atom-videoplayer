@@ -7,6 +7,10 @@ haxe:
   - "3.4.7"
   - development
 
+matrix:
+  allow_failures:
+    - haxe: "3.4.7"
+
 branches:
   only:
     - master
