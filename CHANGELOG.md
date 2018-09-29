@@ -1,3 +1,6 @@
+## 1.5.1
+- Save screenshots in path of video file
+ 
 ## 1.5.0
 - Custom video scale mode
 - Listen/Apply pane background settings changes
