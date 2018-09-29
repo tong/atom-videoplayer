@@ -1,8 +1,12 @@
+## 1.5.0
+- Custom video scale mode
+- Listen/Apply pane background settings changes
+
 ## 1.4.2
 - Set error notification details, dismissable and icon
 
 ## 1.4.1
-- Use @:expose("*") instead of module export
+- Use @:expose instead of module export
 
 ## 1.4.0
 - Bind commands to player instance
