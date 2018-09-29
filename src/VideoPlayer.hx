@@ -88,9 +88,8 @@ class VideoPlayer {
         element.classList.add( 'videoplayer' );
         element.setAttribute( 'tabindex', '-1' );
 
-        if( !config.get( 'videoplayer.background.transparent' ) ) {
+        if( !config.get( 'videoplayer.background.transparent' ) )
             element.style.background = config.get( 'videoplayer.background.color' ).toHexString();
-        }
 
 		video = document.createVideoElement();
         video.controls = true;
@@ -99,20 +98,10 @@ class VideoPlayer {
 
 		setScaleMode( config.get( 'videoplayer.scale' ) );
 
-        element.addEventListener( 'DOMNodeInserted', handleInsertDOM, false );
-
         video.addEventListener( 'canplaythrough', handleVideoCanPlay, false );
         video.addEventListener( 'playing', handleVideoPlay, false );
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
-        //video.addEventListener( 'loadeddata', function(e) trace(e) );
-        //video.addEventListener( 'loadedmetadata', function(e) trace(e) );
-        //video.addEventListener( 'durationchange', function(e) trace(e) );
-        //video.addEventListener( 'mousedown', handleMouseDown, false );
-        //video.addEventListener( 'mouseup', handleMouseUp, false );
-        //video.addEventListener( 'mouseout', handleMouseUp, false );
-        //video.addEventListener( 'mouseup', handleMouseUp, false );
-		//video.addEventListener( 'keydown', function(e) trace(e) );
 
         commands = new CompositeDisposable();
 		addCommand( 'play', e -> {
@@ -123,7 +112,6 @@ class VideoPlayer {
 		} );
 		addCommand( 'seek-forward', e -> {
 			var ev = e.originalEvent;
-			//trace(ev.keyCode);
 			var v = switch ev.keyCode {
 			case 39: ev.shiftKey ? 60 : 10; // Left
 			case 33: 600; // Pageup
@@ -209,9 +197,7 @@ class VideoPlayer {
 
 	public function dispose() {
         commands.dispose();
-        element.removeEventListener( 'DOMNodeInserted', handleInsertDOM );
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
-		//video.removeEventListener( 'loadedmetadata', function(e) trace(e) );
         video.removeEventListener( 'playing', handleVideoPlay );
         video.removeEventListener( 'ended', handleVideoEnd );
         video.removeEventListener( 'error', handleVideoError );
@@ -265,17 +251,6 @@ class VideoPlayer {
 		if( mode == 'original' ) mode = 'none';
 		video.style.objectFit = mode;
 	}
-
-	/*
-	function handleAnimationFrame( time : Float ) {
-		window.requestAnimationFrame( handleAnimationFrame );
-		trace(video.getVideoPlaybackQuality());
-	}
-	*/
-
-    function handleInsertDOM(e) {
-		//window.requestAnimationFrame( handleAnimationFrame );
-    }
 
     function handleVideoCanPlay(e) {
         video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
