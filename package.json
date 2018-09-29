@@ -1,7 +1,7 @@
 {
   "name": "videoplayer",
   "main": "./lib/videoplayer",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "Playback video files",
   "consumedServices": {
     "status-bar": {
@@ -83,17 +83,29 @@
         }
       }
     },
-	"scale": {
-		"title": "Scale Mode",
-		"type": "string",
-		"description": "How to resize video to fit into pane",
-		"default": "contain",
-		"enum": [
-			{ "value": "contain", "description": "Contain" },
-			{ "value": "cover", "description": "Cover" },
-			{ "value": "fill", "description": "Fill" },
-			{ "value": "original", "description": "Original" }
-		]
-	}
+    "scale": {
+      "title": "Scale Mode",
+      "type": "string",
+      "description": "How to resize video to fit into pane",
+      "default": "contain",
+      "enum": [
+        {
+          "value": "contain",
+          "description": "Contain"
+        },
+        {
+          "value": "cover",
+          "description": "Cover"
+        },
+        {
+          "value": "fill",
+          "description": "Fill"
+        },
+        {
+          "value": "original",
+          "description": "Original"
+        }
+      ]
+    }
   }
 }
