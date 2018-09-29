@@ -148,7 +148,8 @@ class VideoPlayer {
 			ctx.drawImage( video, 0, 0, canvas.width, canvas.height );
 			var dataURI = canvas.toDataURL( 'image/png' );
 			dataURI = dataURI.substr( 22 );
-			Fs.writeFile( 'screenshot_'+video.currentTime+'.png', dataURI, { encoding: 'base64' }, function(e){
+			var path = file.getPath().withoutExtension()+'_'+video.currentTime+'.png';
+			Fs.writeFile( path, dataURI, { encoding: 'base64' }, function(e){
 				trace(e);
 			} );
 		} );
