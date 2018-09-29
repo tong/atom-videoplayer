@@ -84,8 +84,6 @@ class VideoPlayer {
 
 		this.file = new File( state.path );
 
-        //var workspaceStyle = window.getComputedStyle( Atom.views.getView( Atom.workspace ) );
-
         element = document.createDivElement();
         element.classList.add( 'videoplayer' );
         element.setAttribute( 'tabindex', '-1' );
@@ -95,10 +93,11 @@ class VideoPlayer {
         }
 
 		video = document.createVideoElement();
-		//video.classList.add( 'scale-down' );
         video.controls = true;
         video.src = file.getPath();
         element.appendChild( video );
+
+		setScaleMode( config.get( 'videoplayer.scale' ) );
 
         element.addEventListener( 'DOMNodeInserted', handleInsertDOM, false );
 
@@ -182,17 +181,18 @@ class VideoPlayer {
         } );
         */
 
-		//TODO listen for config changes
+		config.onDidChange( 'videoplayer.background', e -> {
+			element.style.background = e.newValue.transparent ? null : e.newValue.color.toHexString();
+		} );
+		config.onDidChange( 'videoplayer.scale', e -> {
+			setScaleMode( e.newValue );
+		} );
 
         if( state != null ) {
-			trace( state );
 			if( state.time != null ) video.currentTime = state.time;
             if( state.volume != null ) video.volume = state.volume;
 			if( state.mute ) video.muted = true;
-            if( state.play ) {
-				//play();
-				shouldPlay = true;
-			}
+            if( state.play ) shouldPlay = true;
         }
 	}
 
@@ -259,6 +259,11 @@ class VideoPlayer {
 		} else {
 			untyped video.webkitRequestFullscreen();
 		}
+	}
+
+	function setScaleMode( mode : String ) {
+		if( mode == 'original' ) mode = 'none';
+		video.style.objectFit = mode;
 	}
 
 	/*

@@ -76,12 +76,24 @@
         },
         "color": {
           "title": "Color",
-          "description": "Videoplayer pane background color",
+          "description": "Custom pane background color",
           "type": "color",
           "default": "#000000",
           "order": 2
         }
       }
-    }
+    },
+	"scale": {
+		"title": "Scale Mode",
+		"type": "string",
+		"description": "How to resize video to fit into pane",
+		"default": "contain",
+		"enum": [
+			{ "value": "contain", "description": "Contain" },
+			{ "value": "cover", "description": "Cover" },
+			{ "value": "fill", "description": "Fill" },
+			{ "value": "original", "description": "Original" }
+		]
+	}
   }
 }
