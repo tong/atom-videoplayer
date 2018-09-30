@@ -1,4 +1,10 @@
 
+import Atom.config;
+import Atom.notifications;
+import Atom.workspace;
+import atom.CompositeDisposable;
+import atom.Disposable;
+import atom.File;
 import js.Browser.document;
 import js.Browser.window;
 import js.Node.console;
@@ -6,16 +12,18 @@ import js.html.DivElement;
 import js.html.Element;
 import js.html.VideoElement;
 import js.node.Fs;
-import Atom.config;
-import Atom.notifications;
-import Atom.workspace;
-import atom.CompositeDisposable;
-import atom.Disposable;
-import atom.File;
 
 using Lambda;
 using StringTools;
 using haxe.io.Path;
+
+private typedef State = {
+	path : String,
+	time : Float,
+	volume : Float,
+	play : Bool,
+	mute : Bool,
+};
 
 @:keep
 class VideoPlayer {
@@ -25,7 +33,7 @@ class VideoPlayer {
 	static var statusbar : Element;
 
     @:expose("activate")
-    static function activate( state : Dynamic ) {
+    static function activate( state : State ) {
         disposables = new CompositeDisposable();
 		disposables.add( workspace.addOpener( openURI ) );
         disposables.add( workspace.onDidChangeActivePaneItem( function(item){
@@ -46,12 +54,12 @@ class VideoPlayer {
     }
 
     @:expose("deserialize")
-	static function deserialize( state )
+	static function deserialize( state : State ) {
 		return new VideoPlayer( state );
+	}
 
     static function openURI( uri : String ) {
-        var ext = uri.extension().toLowerCase();
-        if( allowedFileTypes.has( ext ) ) {
+        if( allowedFileTypes.has( uri.extension().toLowerCase() ) ) {
             var player = new VideoPlayer( {
                 path: uri,
                 time: null,
@@ -78,9 +86,8 @@ class VideoPlayer {
 	var element : DivElement;
 	var video : VideoElement;
 	var commands : CompositeDisposable;
-	var shouldPlay = false;
 
-	function new( state ) {
+	function new( state : State ) {
 
 		this.file = new File( state.path );
 
@@ -92,16 +99,19 @@ class VideoPlayer {
             element.style.background = config.get( 'videoplayer.background.color' ).toHexString();
 
 		video = document.createVideoElement();
+		//video.classList.add('no-controls-autohide');
         video.controls = true;
+		video.loop = config.get( 'videoplayer.playback.loop' );
         video.src = file.getPath();
         element.appendChild( video );
 
 		setScaleMode( config.get( 'videoplayer.scale' ) );
 
-        video.addEventListener( 'canplaythrough', handleVideoCanPlay, false );
         video.addEventListener( 'playing', handleVideoPlay, false );
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
+		video.addEventListener( 'click', handleVideoClick, false );
+		video.addEventListener( 'mousewheel', handleMouseWheel, false );
 
         commands = new CompositeDisposable();
 		addCommand( 'play', e -> {
@@ -150,38 +160,25 @@ class VideoPlayer {
 			dataURI = dataURI.substr( 22 );
 			var path = file.getPath().withoutExtension()+'_'+video.currentTime+'.png';
 			Fs.writeFile( path, dataURI, { encoding: 'base64' }, function(e){
-				trace(e);
+				if( e != null ) {
+					trace(e);
+					notifications.addError( 'Failed to save screenshot' );
+				}
 			} );
 		} );
-		/*
-		addCommand( 'volume', e -> {
-			trace(e);
-			//video.volume = Math.max( video.volume - 0.1, 0.0 );
-		} );
-		*/
 
-        /*
-		var item = Atom.contextMenu.add( untyped {
-            'video': [
-                //{ label: 'Fullscreen', command: 'videoplayer:toggle-fullscreen' }, // TODO Not working ?
-                { label: 'Mute', command: 'videoplayer:mute' },
-                { label: 'Screenshot', command: 'videoplayer:screenshot' }
-            ]
-        } );
-        */
-
-		config.onDidChange( 'videoplayer.background', e -> {
+		config.onDidChange( "videoplayer.playback.autoplay", {}, e -> video.autoplay = e.newValue );
+		config.onDidChange( "videoplayer.playback.loop", {}, e -> video.loop = e.newValue );
+		config.onDidChange( "videoplayer.scale", {}, e -> setScaleMode( e.newValue ) );
+		config.onDidChange( "videoplayer.background", {}, function(e) {
 			element.style.background = e.newValue.transparent ? null : e.newValue.color.toHexString();
-		} );
-		config.onDidChange( 'videoplayer.scale', e -> {
-			setScaleMode( e.newValue );
 		} );
 
         if( state != null ) {
+			if( state.mute ) video.muted = true;
 			if( state.time != null ) video.currentTime = state.time;
             if( state.volume != null ) video.volume = state.volume;
-			if( state.mute ) video.muted = true;
-            if( state.play ) shouldPlay = true;
+            if( state.play ) video.oncanplaythrough = e -> video.play();
         }
 	}
 
@@ -198,7 +195,6 @@ class VideoPlayer {
 
 	public function dispose() {
         commands.dispose();
-        video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
         video.removeEventListener( 'playing', handleVideoPlay );
         video.removeEventListener( 'ended', handleVideoEnd );
         video.removeEventListener( 'error', handleVideoError );
@@ -208,31 +204,29 @@ class VideoPlayer {
         video = null;
 	}
 
+	public function getEncodedURI()
+		return "file://" + getPath().urlEncode();
+
+	public function getIconName()
+		return 'file-media';
+
 	public function getPath()
         return file.getPath();
 
     public function getTitle()
         return file.getBaseName();
 
-	public function getIconName()
-        return 'file-media';
-
     public function getURI()
-            return getPath();
-
-	public function getEncodedURI()
-        return "file://" + getPath().urlEncode();
+        return getPath();
 
 	public function isEqual( other : Dynamic )
 		return Std.is( other, VideoPlayer );
 
-	function addCommand<T:haxe.Constraints.Function>( name : String, fn : T )
-		commands.add( Atom.commands.add( untyped element, 'videoplayer:$name', fn ) );
+	inline function addCommand<T:haxe.Constraints.Function>( name : String, fn : T )
+		commands.add( Atom.commands.add( element, 'videoplayer:$name', fn ) );
 
-	function seek( secs : Float ) : Float {
+	inline function seek( secs : Float )
 		video.currentTime += secs;
-		return video.currentTime;
-	}
 
 	inline function togglePlayback()
 		video.paused ? video.play() : video.pause();
@@ -242,9 +236,9 @@ class VideoPlayer {
 
 	function toggleFullscreen() {
 		if( Atom.isFullScreen() ) {
-			untyped document.webkitExitFullscreen();
+			untyped document.exitFullscreen();
 		} else {
-			untyped video.webkitRequestFullscreen();
+			untyped video.requestFullscreen();
 		}
 	}
 
@@ -253,28 +247,19 @@ class VideoPlayer {
 		video.style.objectFit = mode;
 	}
 
-    function handleVideoCanPlay(e) {
-        video.removeEventListener( 'canplaythrough', handleVideoCanPlay );
-		video.addEventListener( 'click', handleVideoClick, false );
-		video.addEventListener( 'mousewheel', handleMouseWheel, false );
-		if( shouldPlay ) {
-			shouldPlay = false;
-			video.play();
-		}
-    }
-
     function handleVideoPlay(e) {
-        statusbar.textContent = video.videoWidth+'x'+video.videoHeight;
+        //statusbar.textContent = video.videoWidth+'x'+video.videoHeight;
     }
 
     function handleVideoEnd(e) {
-		if( config.get( 'videoplayer.playback.loop' ) ) video.play();
+		//trace(e);
+		//if( config.get( 'videoplayer.playback.loop' ) ) video.play();
     }
 
     function handleVideoError(e) {
 		console.error( e );
 		//video.classList.add( 'error' );
-		notifications.addError( 'Cannot play video', { detail: getPath(), dismissable: true, icon: 'file-media' } );
+		//notifications.addError( 'Failed to play video', { detail: getPath(), dismissable: true, icon: 'file-media' } );
     }
 
     function handleVideoClick(e) {
