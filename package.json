@@ -85,6 +85,7 @@
     },
     "scale": {
       "title": "Scale Mode",
+	   "order": 3,
       "type": "string",
       "description": "How to resize video to fit into pane",
       "default": "contain",
