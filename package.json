@@ -1,7 +1,7 @@
 {
   "name": "videoplayer",
   "main": "./lib/videoplayer",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Playback video files",
   "consumedServices": {
     "status-bar": {
@@ -85,7 +85,7 @@
     },
     "scale": {
       "title": "Scale Mode",
-	   "order": 3,
+      "order": 3,
       "type": "string",
       "description": "How to resize video to fit into pane",
       "default": "contain",
