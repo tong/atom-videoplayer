@@ -144,6 +144,23 @@ class VideoPlayer {
 		addCommand( 'volume-decrease', e -> {
 			video.volume = Math.max( video.volume - 0.1, 0.0 );
 		} );
+		addCommand( 'playbackrate-increase', e -> {
+			var rate = video.playbackRate;
+			rate += 0.1;
+			if( rate >= 10 ) rate = 10;
+			video.playbackRate = rate;
+			//trace(video.playbackRate);
+		} );
+		addCommand( 'playbackrate-decrease', e -> {
+			var rate = video.playbackRate;
+			rate -= 0.1;
+			if( rate <= 0.1 ) rate = 0.1;
+			video.playbackRate = rate;
+			trace(video.playbackRate);
+		} );
+		addCommand( 'playbackrate-reset', e -> {
+			video.playbackRate = 1.0;
+		});
 		addCommand( 'toggle-fullscreen', e -> {
 			toggleFullscreen();
 		} );

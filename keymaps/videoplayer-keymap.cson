@@ -16,3 +16,6 @@
     'f':            'videoplayer:toggle-fullscreen'
     's':            'videoplayer:screenshot'
     '0':            'videoplayer:goto-start'
+    'u':      'videoplayer:playbackrate-increase'
+    'i':      'videoplayer:playbackrate-decrease'
+    'r':      'videoplayer:playbackrate-reset'

@@ -2,6 +2,7 @@
     'video': [
         { type: 'separator' },
         { label: 'Mute', command: 'videoplayer:mute' },
+        { label: 'Reset Playbackrate', command: 'videoplayer:playbackrate-reset' },
         { label: 'Screenshot', command: 'videoplayer:screenshot' },
         { type: 'separator' }
     ]
