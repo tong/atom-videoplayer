@@ -1,3 +1,11 @@
+## 1.8.0
+- Improve keyboard controls
+- Fix toggle play on click, space
+- Show playbarate in statusbar
+
+## 1.7.0
+- Add playbackrate control
+
 ## 1.5.1
 - Save screenshots in path of video file
  
