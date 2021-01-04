@@ -5,4 +5,4 @@ VideoPlayer
 -dce full
 -D hxnodejs_no_version_warning
 #-debug
---no-traces
+#--no-traces
