@@ -40,7 +40,7 @@ class VideoPlayer {
             if( Std.is( item, VideoPlayer ) ) {
 				var player : VideoPlayer = item;
                 var video = player.video;
-				statusbar.textContent = video.videoWidth+'x'+video.videoHeight;
+				//statusbar.textContent = video.videoWidth+'x'+video.videoHeight;
 			} else {
 				statusbar.textContent = '';
 			}
@@ -86,6 +86,7 @@ class VideoPlayer {
 	var element : DivElement;
 	var video : VideoElement;
 	var commands : CompositeDisposable;
+	var playbackRate = 10;
 
 	function new( state : State ) {
 
@@ -110,15 +111,17 @@ class VideoPlayer {
         video.addEventListener( 'playing', handleVideoPlay, false );
         video.addEventListener( 'ended', handleVideoEnd, false );
         video.addEventListener( 'error', handleVideoError, false );
-		video.addEventListener( 'click', handleVideoClick, false );
+		//video.addEventListener( 'click', handleVideoClick, false );
 		video.addEventListener( 'mousewheel', handleMouseWheel, false );
 
         commands = new CompositeDisposable();
 		addCommand( 'play', e -> {
 			togglePlayback();
+			updateStatusbar();
 		} );
 		addCommand( 'mute', e -> {
 			toggleMute();
+			updateStatusbar();
 		} );
 		addCommand( 'seek-forward', e -> {
 			var ev = e.originalEvent;
@@ -145,21 +148,21 @@ class VideoPlayer {
 			video.volume = Math.max( video.volume - 0.1, 0.0 );
 		} );
 		addCommand( 'playbackrate-increase', e -> {
-			var rate = video.playbackRate;
-			rate += 0.1;
-			if( rate >= 10 ) rate = 10;
-			video.playbackRate = rate;
-			//trace(video.playbackRate);
+			playbackRate += 1;
+			if( playbackRate > 20 ) playbackRate = 20;
+			video.playbackRate = playbackRate/10;
+			updateStatusbar();
 		} );
 		addCommand( 'playbackrate-decrease', e -> {
-			var rate = video.playbackRate;
-			rate -= 0.1;
-			if( rate <= 0.1 ) rate = 0.1;
-			video.playbackRate = rate;
-			trace(video.playbackRate);
+			playbackRate -= 1;
+			if( playbackRate < 1 ) playbackRate = 1;
+			video.playbackRate = playbackRate/10;
+			updateStatusbar();
 		} );
 		addCommand( 'playbackrate-reset', e -> {
-			video.playbackRate = 1.0;
+			playbackRate = 10;
+			video.playbackRate = playbackRate / 10;
+			updateStatusbar();
 		});
 		addCommand( 'toggle-fullscreen', e -> {
 			toggleFullscreen();
@@ -215,7 +218,7 @@ class VideoPlayer {
         video.removeEventListener( 'playing', handleVideoPlay );
         video.removeEventListener( 'ended', handleVideoEnd );
         video.removeEventListener( 'error', handleVideoError );
-        video.removeEventListener( 'click', handleVideoClick );
+        //video.removeEventListener( 'click', handleVideoClick );
         video.removeEventListener( 'mousewheel', handleMouseWheel );
         video.remove();
         video = null;
@@ -245,8 +248,9 @@ class VideoPlayer {
 	inline function seek( secs : Float )
 		video.currentTime += secs;
 
-	inline function togglePlayback()
+	inline function togglePlayback() {
 		video.paused ? video.play() : video.pause();
+	}
 
     inline function toggleMute()
         video.muted = !video.muted;
@@ -264,12 +268,24 @@ class VideoPlayer {
 		video.style.objectFit = mode;
 	}
 
+	function updateStatusbar() {
+		if( video == null ) {
+			statusbar.textContent = '';
+		} else {
+			var info = 'Size:'+video.videoWidth+'x'+video.videoHeight;
+			info += ', Playbackrate x '+(playbackRate/10);
+			statusbar.textContent = info;
+		}
+	}
+
     function handleVideoPlay(e) {
+		updateStatusbar();
         //statusbar.textContent = video.videoWidth+'x'+video.videoHeight;
     }
 
     function handleVideoEnd(e) {
 		//trace(e);
+		///updateStatusbar();
 		//if( config.get( 'videoplayer.playback.loop' ) ) video.play();
     }
 
@@ -279,9 +295,9 @@ class VideoPlayer {
 		//notifications.addError( 'Failed to play video', { detail: getPath(), dismissable: true, icon: 'file-media' } );
     }
 
-    function handleVideoClick(e) {
-        togglePlayback();
-    }
+   /*  function handleVideoClick(e) {
+        //togglePlayback();
+    } */
 
 	function handleMouseWheel(e) {
 		var v = (e.wheelDelta < 0) ? -1 : 1;
